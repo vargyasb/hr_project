@@ -46,6 +46,15 @@ public class SmartEmployeeService implements EmployeeService {
 		} else if (years >= config.getEmployee().getSmart().getLimitLow() && years < config.getEmployee().getSmart().getLimitMid()) {
 			percent = config.getEmployee().getSmart().getPercentLow();
 		}
+//		if (years >= limitHigh) {
+//			percent = percentHigh;
+//		} else if (years >= limitMid
+//				&& years < limitHigh) {
+//			percent = percentMid;
+//		} else if (years >= limitLow
+//				&& years < limitMid) {
+//			percent = percentLow;
+//		}
 
 		return percent;
 	}
