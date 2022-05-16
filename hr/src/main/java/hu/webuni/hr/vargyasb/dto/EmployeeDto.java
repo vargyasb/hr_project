@@ -1,19 +1,19 @@
-package hu.webuni.hr.vargyasb.model;
+package hu.webuni.hr.vargyasb.dto;
 
 import java.time.LocalDateTime;
 
-public class Employee {
+public class EmployeeDto {
 	private Long id;
 	private String name;
 	private String position;
 	private int salary;
 	private LocalDateTime startOfEmployment;
 
-	public Employee() {
+	public EmployeeDto() {
 
 	}
 
-	public Employee(Long id, String name, String position, int salary, LocalDateTime localDateTime) {
+	public EmployeeDto(Long id, String name, String position, int salary, LocalDateTime localDateTime) {
 		this.id = id;
 		this.name = name;
 		this.position = position;
@@ -60,5 +60,4 @@ public class Employee {
 	public void setStartOfEmployment(LocalDateTime startOfEmployment) {
 		this.startOfEmployment = startOfEmployment;
 	}
-
 }
