@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import hu.webuni.hr.vargyasb.model.Employee;
 
@@ -20,7 +21,7 @@ public class HrTLController {
 		employees.add(new Employee(1L, "Steve", "Game Dev", 3000, LocalDateTime.of(2010, 10, 13, 10, 25)));
 		employees.add(new Employee(2L, "Peter", "HR Associate", 2000, LocalDateTime.of(2015, 10, 13, 10, 25)));
 		employees.add(new Employee(3L, "Anna", "Scrum Master", 2800, LocalDateTime.of(2020, 05, 10, 10, 25)));
-		employees.add(new Employee(3L, "David", "Project Manager", 3200, LocalDateTime.of(2021, 10, 13, 10, 25)));
+		employees.add(new Employee(4L, "David", "Project Manager", 3200, LocalDateTime.of(2021, 10, 13, 10, 25)));
 	}
 	
 	@GetMapping("/")
@@ -39,6 +40,14 @@ public class HrTLController {
 	public String addEmployee(Employee employee) {
 		employees.add(employee);
 		return "redirect:employees";
+	}
+	
+	@GetMapping("/employee")
+	public String selectEmployee(@RequestParam(name = "id") long id, Map<String, Object> model) {
+		//ide valahogy egy Employeenak kell bejonnie parameternek, amit berakok az employees Listába
+		//es redirect-elek
+		model.put("newEmployee", new Employee());
+		return "employee";
 	}
 	
 }

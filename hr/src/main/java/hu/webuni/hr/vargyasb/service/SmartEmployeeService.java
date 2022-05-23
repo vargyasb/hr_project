@@ -39,12 +39,12 @@ public class SmartEmployeeService implements EmployeeService {
 		long years = ChronoUnit.YEARS.between(employee.getStartOfEmployment(), LocalDateTime.now());
 		int percent = 0;
 
-		if (years >= config.getEmployee().getSmart().getLimitHigh()) {
-			percent = config.getEmployee().getSmart().getPercentHigh();
-		} else if (years >= config.getEmployee().getSmart().getLimitMid() && years < config.getEmployee().getSmart().getLimitHigh()) {
-			percent = config.getEmployee().getSmart().getPercentMid();
-		} else if (years >= config.getEmployee().getSmart().getLimitLow() && years < config.getEmployee().getSmart().getLimitMid()) {
-			percent = config.getEmployee().getSmart().getPercentLow();
+		if (years >= config.getSalary().getSmart().getLimitHigh()) {
+			percent = config.getSalary().getSmart().getPercentHigh();
+		} else if (years >= config.getSalary().getSmart().getLimitMid()) {
+			percent = config.getSalary().getSmart().getPercentMid();
+		} else if (years >= config.getSalary().getSmart().getLimitLow()) {
+			percent = config.getSalary().getSmart().getPercentLow();
 		}
 //		if (years >= limitHigh) {
 //			percent = percentHigh;

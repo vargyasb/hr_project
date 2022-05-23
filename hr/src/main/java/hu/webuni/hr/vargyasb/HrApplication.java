@@ -25,7 +25,7 @@ public class HrApplication implements CommandLineRunner{
 		System.out.println("Steve has a salary of: " + salaryService.calculateNewSalaryFor(new Employee(1L, "Steve", "Game Dev", 3000, LocalDateTime.of(2010, 10, 13, 10, 25))));
 		System.out.println("Peter has a salary of:  " + salaryService.calculateNewSalaryFor(new Employee(2L, "Peter", "HR Associate", 2000, LocalDateTime.of(2015, 10, 13, 10, 25))));
 		System.out.println("Anna has a salary of:  " + salaryService.calculateNewSalaryFor(new Employee(3L, "Anna", "Scrum Master", 2800, LocalDateTime.of(2020, 05, 10, 10, 25))));
-		System.out.println("David has a salary of:  " + salaryService.calculateNewSalaryFor(new Employee(3L, "David", "Project Manager", 3200, LocalDateTime.of(2021, 10, 13, 10, 25))));
+		System.out.println("David has a salary of:  " + salaryService.calculateNewSalaryFor(new Employee(4L, "David", "Project Manager", 3200, LocalDateTime.of(2021, 10, 13, 10, 25))));
 	}
 
 }

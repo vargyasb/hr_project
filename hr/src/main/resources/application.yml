@@ -1,0 +1,19 @@
+spring:
+  profiles:
+    active:
+    - smart
+  
+  thymeleaf:
+    cache: false
+
+hr:
+  salary:
+    def:
+      limit: 5
+    smart:
+      limitHigh: 10
+      limitMid: 5
+      limitLow: 2.5
+      percentHigh: 10
+      percentMid: 5
+      percentLow: 2

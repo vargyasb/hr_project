@@ -4,18 +4,31 @@
 <meta charset="UTF-8">
 <title>HR Application</title>
 </head>
+<style>
+table, th, td {
+  border:1px solid black;
+}
+</style>
 <body>
 	<h1>List of Employees</h1>
 	
-	<table>
-	<tr th:each="employee: ${employees}">
+	<table style="width: 20%">
+	<tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Position</th>
+    <th>Salary</th>
+    </tr>
+	<tr th:each="employee: ${employees}" >
     	<td th:text="${employee.id}">id</td>
-    	<td th:text="${employee.name}">name</td>
+    	<!--  <td th:text="${employee.name}" >name</td>-->
+    	<td><a th:text="${employee.name}" th:href="@{/employee(id=${employee.id})}">name</a></td>
     	<td th:text="${employee.position}">position</td>
     	<td th:text="${employee.salary}">salary</td>
 	</tr>
 	</table>
-	
+	<br/>
+	<h2>Add New Employee</h2>
 	<form th:action="@{/employees}" method="post" th:object="${newEmployee}">
 		Id: <input th:field="*{id}" /> <br/>
 		Name: <input th:field="*{name}" /> <br/>

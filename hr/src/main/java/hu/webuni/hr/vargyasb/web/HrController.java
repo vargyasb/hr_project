@@ -19,11 +19,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import hu.webuni.hr.vargyasb.dto.EmployeeDto;
-import hu.webuni.hr.vargyasb.model.Employee;
 
 @RestController
 @RequestMapping("/api/employees")
-public class EmployeeController {
+public class HrController {
 
 	private Map<Long, EmployeeDto> employees = new HashMap<>();
 
@@ -31,8 +30,7 @@ public class EmployeeController {
 		employees.put(1L, new EmployeeDto(1L, "Steve", "Game Dev", 3000, LocalDateTime.of(2010, 10, 13, 10, 25)));
 		employees.put(2L, new EmployeeDto(2L, "Peter", "HR Associate", 2000, LocalDateTime.of(2015, 10, 13, 10, 25)));
 		employees.put(3L, new EmployeeDto(3L, "Anna", "Scrum Master", 2800, LocalDateTime.of(2020, 05, 10, 10, 25)));
-		employees.put(4L,
-				new EmployeeDto(4L, "David", "Project Manager", 3200, LocalDateTime.of(2021, 10, 13, 10, 25)));
+		employees.put(4L, new EmployeeDto(4L, "David", "Project Manager", 3200, LocalDateTime.of(2021, 10, 13, 10, 25)));
 	}
 
 	// Osszes alkalmazott visszaadasa
@@ -78,12 +76,12 @@ public class EmployeeController {
 	}
 
 	//Egy query parameterben megkapott erteknel magasabb havi fizetesu alkalmazottak
-	@GetMapping("/salary")
+	@GetMapping("/filter")
 	public List<EmployeeDto> getEmployeesWhoseSalaryIsGreaterThan(@RequestParam int salary) {
-		List<EmployeeDto> employeesWhoseSalaryIsGreaterThan = new ArrayList<>(employees.values());
-		return employeesWhoseSalaryIsGreaterThan
+		return employees.values()
 				.stream()
 				.filter(e -> e.getSalary() > salary)
 				.collect(Collectors.toList());
 	}
+
 }

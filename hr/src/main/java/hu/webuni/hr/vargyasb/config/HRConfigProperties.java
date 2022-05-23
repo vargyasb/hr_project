@@ -7,17 +7,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class HRConfigProperties {
 
-	private Employee employee = new Employee();
+	private Salary salary = new Salary();
 
-	public Employee getEmployee() {
-		return employee;
+	public Salary getSalary() {
+		return salary;
 	}
 
-	public void setEmployee(Employee employee) {
-		this.employee = employee;
+	public void setSalary(Salary salary) {
+		this.salary = salary;
 	}
 
-	public static class Employee {
+	public static class Salary {
 		private Default def = new Default();
 		private Smart smart = new Smart();
 
@@ -39,71 +39,71 @@ public class HRConfigProperties {
 	}
 
 	public static class Default {
-		private int limit;
+		private int percent;
 
-		public int getLimit() {
-			return limit;
+		public int getPercent() {
+			return percent;
 		}
 
-		public void setLimit(int limit) {
-			this.limit = limit;
+		public void setLimit(int percent) {
+			this.percent = percent;
 		}
 
 	}
 
 	public static class Smart {
-		private int limitLow;
-		private int limitMid;
-		private int limitHigh;
-		private int percentLow;
-		private int percentMid;
-		private int percentHigh;
+		private Double limitLow;
+		private Double limitMid;
+		private Double limitHigh;
+		private Integer percentLow;
+		private Integer percentMid;
+		private Integer percentHigh;
 
-		public int getLimitLow() {
+		public Double getLimitLow() {
 			return limitLow;
 		}
 
-		public void setLimitLow(int limitLow) {
+		public void setLimitLow(Double limitLow) {
 			this.limitLow = limitLow;
 		}
 
-		public int getLimitMid() {
+		public Double getLimitMid() {
 			return limitMid;
 		}
 
-		public void setLimitMid(int limitMid) {
+		public void setLimitMid(Double limitMid) {
 			this.limitMid = limitMid;
 		}
 
-		public int getLimitHigh() {
+		public Double getLimitHigh() {
 			return limitHigh;
 		}
 
-		public void setLimitHigh(int limitHigh) {
+		public void setLimitHigh(Double limitHigh) {
 			this.limitHigh = limitHigh;
 		}
 
-		public int getPercentLow() {
+		public Integer getPercentLow() {
 			return percentLow;
 		}
 
-		public void setPercentLow(int percentLow) {
+		public void setPercentLow(Integer percentLow) {
 			this.percentLow = percentLow;
 		}
 
-		public int getPercentMid() {
+		public Integer getPercentMid() {
 			return percentMid;
 		}
 
-		public void setPercentMid(int percentMid) {
+		public void setPercentMid(Integer percentMid) {
 			this.percentMid = percentMid;
 		}
 
-		public int getPercentHigh() {
+		public Integer getPercentHigh() {
 			return percentHigh;
 		}
 
-		public void setPercentHigh(int percentHigh) {
+		public void setPercentHigh(Integer percentHigh) {
 			this.percentHigh = percentHigh;
 		}
 
