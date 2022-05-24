@@ -13,7 +13,7 @@ table, th, td {
 	<h1>Employee Attributes</h1>
 	
 	<form th:action="@{/employees}" method="post" th:object="${newEmployee}">
-		Name: <input th:field="*{name}" /> <br/>
+		Name: <input th:field="*{name}" value="BBBB"/> <br/>
 		Position: <input th:field="*{position}" /> <br/>
 		Salary: <input th:field="*{salary}" /> <br/>
 		<input type="submit" value="Submit" />

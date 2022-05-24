@@ -46,7 +46,11 @@ public class HrTLController {
 	public String selectEmployee(@RequestParam(name = "id") long id, Map<String, Object> model) {
 		//ide valahogy egy Employeenak kell bejonnie parameternek, amit berakok az employees Listába
 		//es redirect-elek
-		model.put("newEmployee", new Employee());
+		for (Employee employee : employees) {
+			if (employee.getId() == id) {
+				model.put("newEmployee", employee);
+			}
+		}
 		return "employee";
 	}
 	
