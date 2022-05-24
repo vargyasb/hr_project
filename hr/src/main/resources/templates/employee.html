@@ -2,18 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>Employee</title>
+<title>Employee Details</title>
 </head>
-<style>
-table, th, td {
-  border:1px solid black;
-}
-</style>
 <body>
-	<h1>Employee Attributes</h1>
+	<h1>Employee Details</h1>
 	
-	<form th:action="@{/employees}" method="post" th:object="${newEmployee}">
-		Name: <input th:field="*{name}" value="BBBB"/> <br/>
+	<form th:action="@{/employee}" method="post" th:object="${newEmployee}">
+		<input type="hidden" th:field="*{id}" />
+		Name: <input th:field="*{name}"/> <br/>
 		Position: <input th:field="*{position}" /> <br/>
 		Salary: <input th:field="*{salary}" /> <br/>
 		<input type="submit" value="Submit" />

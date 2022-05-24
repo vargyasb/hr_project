@@ -44,14 +44,39 @@ public class HrTLController {
 	
 	@GetMapping("/employee")
 	public String selectEmployee(@RequestParam(name = "id") long id, Map<String, Object> model) {
-		//ide valahogy egy Employeenak kell bejonnie parameternek, amit berakok az employees Listába
-		//es redirect-elek
 		for (Employee employee : employees) {
 			if (employee.getId() == id) {
 				model.put("newEmployee", employee);
 			}
 		}
 		return "employee";
+	}
+	
+	@PostMapping("/employee")
+	public String updateEmployee(Employee employee) {
+		for (Employee storedEmployee : employees) {
+			if (storedEmployee.getId() == employee.getId()) {
+				storedEmployee.setName(employee.getName());
+				storedEmployee.setPosition(employee.getPosition());
+				storedEmployee.setSalary(employee.getSalary());
+			}
+		}
+		return "redirect:employees";
+	}
+	
+	@GetMapping("/deleteEmployee")
+	public String deleteEmployee(@RequestParam(name = "id") long id) {
+		/*
+		 * Itt (forEach) Exception dobódik, latszolag veletlenszeruen. 
+		 * Lehetseges, hogy ott lesz a baj, hogy torlom az elemet es kozben iteralok a kollekcion?
+		 * Ennek ellenere kitorli az adott elemet, de 500-as errort kapok bongeszoben.
+		 */
+		for (Employee employee : employees) {
+			if (employee.getId() == id) {
+				employees.remove(employee);
+			}
+		}
+		return "redirect:employees";
 	}
 	
 }
