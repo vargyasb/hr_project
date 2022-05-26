@@ -4,21 +4,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CompanyDto {
+	private long id;
 	private String registrationNumber;
 	private String name;
 	private String address;
-	private List<EmployeeDto> employees;
+	private List<EmployeeDto> employees = new ArrayList<>();
 
-	public CompanyDto(String registrationNumber, String name, String address) {
-		super();
+	public CompanyDto(long id, String registrationNumber, String name, String address) {
+		this.id = id;
 		this.registrationNumber = registrationNumber;
 		this.name = name;
 		this.address = address;
-		this.employees = new ArrayList<>();
 	}
 
 	public CompanyDto() {
-		super();
+
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	public String getRegistrationNumber() {
