@@ -2,11 +2,21 @@ package hu.webuni.hr.vargyasb.dto;
 
 import java.time.LocalDateTime;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
+
 public class EmployeeDto {
 	private Long id;
+	@NotBlank
 	private String name;
+	@NotBlank
 	private String position;
+	@Min(value = 0, message = "Value must be positive")
 	private int salary;
+	@Past(message = "Start of Employment must be in the past")
 	private LocalDateTime startOfEmployment;
 
 	public EmployeeDto() {

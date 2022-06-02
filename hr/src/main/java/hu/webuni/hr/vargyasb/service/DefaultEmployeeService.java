@@ -7,7 +7,7 @@ import hu.webuni.hr.vargyasb.config.HRConfigProperties;
 import hu.webuni.hr.vargyasb.model.Employee;
 
 @Service
-public class DefaultEmployeeService implements EmployeeService{
+public class DefaultEmployeeService extends AbstractEmployee{
 	
 	@Autowired
 	HRConfigProperties hrConfig;

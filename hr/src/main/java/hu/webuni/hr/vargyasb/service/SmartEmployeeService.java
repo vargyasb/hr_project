@@ -11,7 +11,7 @@ import hu.webuni.hr.vargyasb.config.HRConfigProperties;
 import hu.webuni.hr.vargyasb.model.Employee;
 
 @Service
-public class SmartEmployeeService implements EmployeeService {
+public class SmartEmployeeService extends AbstractEmployee {
 	
 //	@Value("${hr.employee.smart.limitlow}")
 //	private int limitLow;
