@@ -18,6 +18,7 @@ public abstract class AbstractEmployee implements EmployeeService {
 		employees.put(2L, new Employee(2L, "Peter", "HR Associate", 2000, LocalDateTime.of(2015, 10, 13, 10, 25)));
 		employees.put(3L, new Employee(3L, "Anna", "Scrum Master", 2800, LocalDateTime.of(2020, 05, 10, 10, 25)));
 		employees.put(4L, new Employee(4L, "David", "Project Manager", 3200, LocalDateTime.of(2021, 10, 13, 10, 25)));
+		employees.put(5L, new Employee(5L, "Michael", "Branch Manager", 1600, LocalDateTime.of(1995, 10, 13, 10, 25)));
 	}
 	
 	public Employee save(Employee employee) {
