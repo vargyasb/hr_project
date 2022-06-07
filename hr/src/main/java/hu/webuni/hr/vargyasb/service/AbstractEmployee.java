@@ -1,47 +1,67 @@
 package hu.webuni.hr.vargyasb.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
 import hu.webuni.hr.vargyasb.model.Employee;
+import hu.webuni.hr.vargyasb.repository.EmployeeRepository;
 
 public abstract class AbstractEmployee implements EmployeeService {
 
-	private Map<Long, Employee> employees = new HashMap<>();
-
-	{
-		employees.put(1L, new Employee(1L, "Steve", "Game Dev", 3000, LocalDateTime.of(2010, 10, 13, 10, 25)));
-		employees.put(2L, new Employee(2L, "Peter", "HR Associate", 2000, LocalDateTime.of(2015, 10, 13, 10, 25)));
-		employees.put(3L, new Employee(3L, "Anna", "Scrum Master", 2800, LocalDateTime.of(2020, 05, 10, 10, 25)));
-		employees.put(4L, new Employee(4L, "David", "Project Manager", 3200, LocalDateTime.of(2021, 10, 13, 10, 25)));
-		employees.put(5L, new Employee(5L, "Michael", "Branch Manager", 1600, LocalDateTime.of(1995, 10, 13, 10, 25)));
+	@Autowired
+	EmployeeRepository employeeRepository;
+	
+	@Transactional
+	public Employee save(Employee employee) {
+		return employeeRepository.save(employee);
 	}
 	
-	public Employee save(Employee employee) {
-		employees.put(employee.getId(), employee);
-		return employee;
+	@Transactional
+	public Employee update(Employee employee) {
+		if (employeeRepository.existsById(employee.getId())) {
+			return employeeRepository.save(employee);
+		} else {
+			throw new NoSuchElementException();
+		}
 	}
 	
 	public List<Employee> findAll() {
-		return new ArrayList<>(employees.values());
+		return employeeRepository.findAll();
 	}
 	
-	public Employee findById(Long id) {
-		return employees.get(id);
+	public Optional<Employee> findById(Long id) {
+		return employeeRepository.findById(id);
 	}
 	
+	@Transactional
 	public void delete(Long id) {
-		employees.remove(id);
+		employeeRepository.deleteById(id);
 	}
 	
 	public List<Employee> getEmployeesWhoseSalaryIsGreaterThan(int salary) {
-		return employees.values()
+		return employeeRepository.findAll()
 				.stream()
 				.filter(e -> e.getSalary() > salary)
 				.collect(Collectors.toList());
 	}
+
+	public List<Employee> findByPosition(String position) {
+		return employeeRepository.findByPosition(position);
+	}
+
+	public List<Employee> findByNameStartingWithIgnoreCase(String keyword) {
+		return employeeRepository.findByNameStartingWithIgnoreCase(keyword);
+	}
+
+	public List<Employee> findByStartOfEmploymentBetween(LocalDateTime from, LocalDateTime to) {
+		return employeeRepository.findByStartOfEmploymentBetween(from, to);
+	}
+	
+	
 }

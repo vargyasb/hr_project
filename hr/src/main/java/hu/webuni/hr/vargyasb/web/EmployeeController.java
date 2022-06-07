@@ -1,10 +1,13 @@
 package hu.webuni.hr.vargyasb.web;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,49 +35,42 @@ public class EmployeeController {
 	@Autowired
 	private EmployeeMapper employeeMapper;
 	
-	// Osszes alkalmazott visszaadasa
 	@GetMapping
 	public List<EmployeeDto> getAll() {
 		return employeeMapper.employeesToDtos(employeeService.findAll());
 	}
 
-	// Adott id-ju alkalmazott visszaadasa
 	@GetMapping("/{id}")
 	public EmployeeDto getById(@PathVariable Long id) {
-		Employee employee = employeeService.findById(id);
-
-		if (employee != null)
-			return employeeMapper.employeeToDto(employee);
-		else
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+		Employee employee = employeeService.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		
+		return employeeMapper.employeeToDto(employee);
 	}
 
-	// Uj alkalmazott felvetele
 	@PostMapping
 	public EmployeeDto createEmployee(@RequestBody @Valid EmployeeDto employeeDto) {
 		Employee employee = employeeService.save(employeeMapper.employeeDtoToEmployee(employeeDto));
 		return employeeMapper.employeeToDto(employee);
 	}
 
-	// Meglevo alkalmazott modositasa
 	@PutMapping("/{id}")
 	public EmployeeDto modifyEmployee(@PathVariable long id, @RequestBody @Valid EmployeeDto employeeDto) {
-		if (employeeService.findById(id) == null) {
+		employeeDto.setId(id);
+		
+		try {
+			Employee employee = employeeService.update(employeeMapper.employeeDtoToEmployee(employeeDto));
+			return employeeMapper.employeeToDto(employee);
+		} catch (NoSuchElementException e) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 		}
-
-		employeeDto.setId(id);
-		Employee employee = employeeService.save(employeeMapper.employeeDtoToEmployee(employeeDto));
-		return employeeMapper.employeeToDto(employee);
 	}
 
-	// Meglevo alkalmazott torlese
 	@DeleteMapping("/{id}")
 	public void deleteEmpolyee(@PathVariable long id) {
 		employeeService.delete(id);
 	}
 
-	//Egy query parameterben megkapott erteknel magasabb havi fizetesu alkalmazottak
 	@GetMapping("/filter")
 	public List<EmployeeDto> getEmployeesWhoseSalaryIsGreaterThan(@RequestParam int salary) {
 		return employeeMapper.employeesToDtos(employeeService.getEmployeesWhoseSalaryIsGreaterThan(salary));
@@ -83,6 +79,22 @@ public class EmployeeController {
 	@PostMapping("/payRaise")
 	public int getPayRaisePercent(@RequestBody EmployeeDto employeeDto) {
 		return employeeService.getPayRaisePercent(employeeMapper.employeeDtoToEmployee(employeeDto));
+	}
+	
+	@GetMapping("/filterbyposition")
+	public List<EmployeeDto> getEmployeesByPosition(@RequestParam String position) {
+		return employeeMapper.employeesToDtos(employeeService.findByPosition(position));
+	}
+	
+	@GetMapping("/filterbyname")
+	public List<EmployeeDto> getEmployeesNameStartingWith(@RequestParam String keyword) {
+		return employeeMapper.employeesToDtos(employeeService.findByNameStartingWithIgnoreCase(keyword));
+	}
+	
+	@GetMapping("/filterbystartdate")
+	public List<EmployeeDto> getEmployeesByStartOfEmployment(@RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+			@RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to) {
+		return employeeMapper.employeesToDtos(employeeService.findByStartOfEmploymentBetween(from, to));
 	}
 
 }

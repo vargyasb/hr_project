@@ -5,6 +5,17 @@ spring:
   
   thymeleaf:
     cache: false
+    
+  datasource:
+    url: jdbc:postgresql://localhost:5432/hr
+    username: postgres
+    password: 11235813
+  
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
 
 hr:
   salary:
@@ -17,3 +28,4 @@ hr:
       percentHigh: 10
       percentMid: 5
       percentLow: 2
+
