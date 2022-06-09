@@ -1,41 +1,74 @@
 package hu.webuni.hr.vargyasb.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import hu.webuni.hr.vargyasb.model.Company;
+import hu.webuni.hr.vargyasb.model.Employee;
+import hu.webuni.hr.vargyasb.repository.CompanyRepository;
+import hu.webuni.hr.vargyasb.repository.EmployeeRepository;
 
 @Service
 public class CompanyService {
-
-	private Map<Long, Company> companies = new HashMap<>();
-
-	{
-		companies.put(1L, new Company(1L, "123-456", "Webuni", "First str. 10"));
-		companies.put(2L, new Company(2L, "789-123", "Udemy", "Second str. 30"));
-		companies.put(3L, new Company(3L, "456-555", "Coursera", "Third str. 40"));
-		companies.put(4L, new Company(4L, "111-456", "Codeacademy", "Fourt str. 20"));
-	}
 	
+	@Autowired
+	CompanyRepository companyRepository;
+	
+	@Autowired
+	EmployeeRepository employeeRepository;
+	
+	@Transactional
 	public Company save(Company company) {
-		companies.put(company.getId(), company);
-		return company;
+		return companyRepository.save(company);
 	}
 	
 	public List<Company> findAll() {
-		return new ArrayList<>(companies.values());
+		return companyRepository.findAll();
 	}
 	
-	public Company findById(Long id) {
-		return companies.get(id);
+	public Optional<Company> findById(Long id) {
+		return companyRepository.findById(id);
 	}
 	
+	@Transactional
 	public void delete(Long id) {
-		companies.remove(id);
+		companyRepository.deleteById(id);
 	}
 	
+	public Company addEmployee(long id, Employee employee) {
+		Company company = companyRepository.findById(id).get();
+		company.addEmployee(employee);
+		
+		employeeRepository.save(employee);
+		return company;
+	}
+	
+	public Company deleteEmployee(long id, long employeeId) {
+		Company company = companyRepository.findById(id).get();
+		Employee employee = employeeRepository.findById(employeeId).get();
+		employee.setCompany(null);
+		company.getEmployees().remove(employee);
+		employeeRepository.save(employee);
+		return company;
+	}
+	
+	public Company replaceEmployees(long id, List<Employee> employees) {
+		Company company = companyRepository.findById(id).get();
+		for (Employee employee : company.getEmployees()) {
+			employee.setCompany(null);
+		}
+		company.getEmployees().clear();
+		for (Employee employee : employees) {
+			company.addEmployee(employee);
+			employeeRepository.save(employee);
+		}
+		return company;
+	}
+	
+	//CompanyMappert updateli hogy employee-t is mappeljen
+	//mapperbe megirjuk azt is hogy mappelje a companykat ugy hogy kihagy employee-kat ha az isfull bevan kapcs
 }

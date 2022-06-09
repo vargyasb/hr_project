@@ -8,6 +8,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 
+import hu.webuni.hr.vargyasb.model.Company;
+
 public class EmployeeDto {
 	private Long id;
 	@NotBlank
@@ -18,6 +20,8 @@ public class EmployeeDto {
 	private int salary;
 	@Past(message = "Start of Employment must be in the past")
 	private LocalDateTime startOfEmployment;
+	
+	private Company company;
 
 	public EmployeeDto() {
 
@@ -69,5 +73,13 @@ public class EmployeeDto {
 
 	public void setStartOfEmployment(LocalDateTime startOfEmployment) {
 		this.startOfEmployment = startOfEmployment;
+	}
+
+	public Company getCompany() {
+		return company;
+	}
+
+	public void setCompany(Company company) {
+		this.company = company;
 	}
 }

@@ -42,32 +42,34 @@ public class EmployeeController {
 
 	@GetMapping("/{id}")
 	public EmployeeDto getById(@PathVariable Long id) {
-		Employee employee = employeeService.findById(id)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-		
-		return employeeMapper.employeeToDto(employee);
+		return findByIdOrThrowNotFound(id);
 	}
 
 	@PostMapping
 	public EmployeeDto createEmployee(@RequestBody @Valid EmployeeDto employeeDto) {
+		employeeDto.setId(null);
 		Employee employee = employeeService.save(employeeMapper.employeeDtoToEmployee(employeeDto));
 		return employeeMapper.employeeToDto(employee);
 	}
 
 	@PutMapping("/{id}")
 	public EmployeeDto modifyEmployee(@PathVariable long id, @RequestBody @Valid EmployeeDto employeeDto) {
-		employeeDto.setId(id);
+		findByIdOrThrowNotFound(id);
 		
-		try {
-			Employee employee = employeeService.update(employeeMapper.employeeDtoToEmployee(employeeDto));
-			return employeeMapper.employeeToDto(employee);
-		} catch (NoSuchElementException e) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-		}
+		employeeDto.setId(id);
+		Employee employee = employeeService.save(employeeMapper.employeeDtoToEmployee(employeeDto));
+		return employeeMapper.employeeToDto(employee);
+//		try {
+//			Employee employee = employeeService.update(employeeMapper.employeeDtoToEmployee(employeeDto));
+//			return employeeMapper.employeeToDto(employee);
+//		} catch (NoSuchElementException e) {
+//			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+//		}
 	}
 
 	@DeleteMapping("/{id}")
 	public void deleteEmpolyee(@PathVariable long id) {
+		findByIdOrThrowNotFound(id);
 		employeeService.delete(id);
 	}
 
@@ -95,6 +97,12 @@ public class EmployeeController {
 	public List<EmployeeDto> getEmployeesByStartOfEmployment(@RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
 			@RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to) {
 		return employeeMapper.employeesToDtos(employeeService.findByStartOfEmploymentBetween(from, to));
+	}
+	
+	private EmployeeDto findByIdOrThrowNotFound(long id) {
+		Employee employee = employeeService.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		return employeeMapper.employeeToDto(employee);
 	}
 
 }

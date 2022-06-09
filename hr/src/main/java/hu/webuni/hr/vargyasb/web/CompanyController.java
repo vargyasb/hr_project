@@ -19,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import hu.webuni.hr.vargyasb.dto.CompanyDto;
 import hu.webuni.hr.vargyasb.dto.EmployeeDto;
 import hu.webuni.hr.vargyasb.mapper.CompanyMapper;
+import hu.webuni.hr.vargyasb.mapper.EmployeeMapper;
 import hu.webuni.hr.vargyasb.model.Company;
 import hu.webuni.hr.vargyasb.service.CompanyService;
 
@@ -31,36 +32,41 @@ public class CompanyController {
 	
 	@Autowired
 	private CompanyMapper companyMapper;
+	
+	@Autowired
+	private EmployeeMapper employeeMapper;
 
 	@GetMapping
 	public List<CompanyDto> getAll(@RequestParam(required = false) Boolean full) {
-		if (full != null && full) {
-			return companyMapper.companiesToCompanyDtos(companyService.findAll());
+		List<Company> companies = companyService.findAll();
+		if (isFull(full)) {
+			return companyMapper.companiesToCompanyDtos(companies);
+		} else {
+			return companyMapper.companiesToCompanyDtosWithNoEmployees(companies);
 		}
-
-		return companyMapper.companiesToCompanyDtos(companyService.findAll()).stream()
-				.map(c -> new CompanyDto(c.getId(), c.getRegistrationNumber(), c.getName(), c.getAddress()))
-				.collect(Collectors.toList());
 	}
 
 	@GetMapping("/{id}")
-	public CompanyDto findById(@PathVariable long id) {
-		CompanyDto companyDto = findByIdOrThrowNotFound(id);
-		return companyDto;
+	public CompanyDto findById(@PathVariable long id, @RequestParam(required = false) Boolean full) {
+		Company company = companyMapper.companyDtoToCompany(findByIdOrThrowNotFound(id));
+		if (isFull(full)) {
+			return companyMapper.companyToCompanyDto(company);
+		} else {
+			return companyMapper.companyToCompanyDtoWithNoEmployees(company); 
+		}
 	}
 
 	@PostMapping
 	public CompanyDto addNewCompany(@RequestBody CompanyDto companyDto) {
+		companyDto.setId(null);
 		Company company = companyService.save(companyMapper.companyDtoToCompany(companyDto));
 		return companyMapper.companyToCompanyDto(company);
 	}
 
 	@PutMapping("/{id}")
 	public CompanyDto modifyCompany(@PathVariable long id, @RequestBody CompanyDto companyDto) {
-		if (companyService.findById(id) == null) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-		}
-
+		findByIdOrThrowNotFound(id);
+		
 		companyDto.setId(id);
 		Company company = companyService.save(companyMapper.companyDtoToCompany(companyDto));
 		return companyMapper.companyToCompanyDto(company);
@@ -68,38 +74,36 @@ public class CompanyController {
 
 	@DeleteMapping("/{id}")
 	public void deleteCompany(@PathVariable long id) {
+		findByIdOrThrowNotFound(id); 
 		companyService.delete(id);
 	}
 
 	@PostMapping("/{id}/addEmployee")
 	public CompanyDto addNewEmployee(@PathVariable long id, @RequestBody EmployeeDto employeeDto) {
-		CompanyDto companyDto = findByIdOrThrowNotFound(id);
-		
-		companyDto.getEmployees().add(employeeDto);
-		return companyDto;
+		findByIdOrThrowNotFound(id);
+		return companyMapper.companyToCompanyDto(companyService.addEmployee(id, employeeMapper.employeeDtoToEmployee(employeeDto)));
 	}
 
 	@DeleteMapping("/{id}/deleteEmployee/{employeeId}")
 	public CompanyDto deleteEmployee(@PathVariable long id, @PathVariable long employeeId) {
-		CompanyDto companyDto = findByIdOrThrowNotFound(id);
-
-		companyDto.getEmployees().removeIf(e -> e.getId() == employeeId);
-		return companyDto;
+		findByIdOrThrowNotFound(id);
+		return companyMapper.companyToCompanyDto(companyService.deleteEmployee(id, employeeId));
 	}
 
 	@PutMapping("/{id}/addEmployee")
 	public CompanyDto changeEmployees(@PathVariable long id, @RequestBody List<EmployeeDto> employees) {
-		CompanyDto companyDto = findByIdOrThrowNotFound(id);
-
-		companyDto.setEmployees(employees);
-		return companyDto;
+		findByIdOrThrowNotFound(id);
+		return companyMapper.companyToCompanyDto(companyService.replaceEmployees(id, employeeMapper.employeeDtosToemployees(employees)));
 	}
 
 	private CompanyDto findByIdOrThrowNotFound(long id) {
-		if (companyService.findById(id) == null) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-		}
-		return companyMapper.companyToCompanyDto(companyService.findById(id));
+		Company company = companyService.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		return companyMapper.companyToCompanyDto(company);
 	}
 
+	private boolean isFull(Boolean full) {
+		return full != null && full;
+	}
+	
 }

@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,14 +21,14 @@ public abstract class AbstractEmployee implements EmployeeService {
 		return employeeRepository.save(employee);
 	}
 	
-	@Transactional
-	public Employee update(Employee employee) {
-		if (employeeRepository.existsById(employee.getId())) {
-			return employeeRepository.save(employee);
-		} else {
-			throw new NoSuchElementException();
-		}
-	}
+//	@Transactional
+//	public Employee update(Employee employee) {
+//		if (employeeRepository.existsById(employee.getId())) {
+//			return employeeRepository.save(employee);
+//		} else {
+//			throw new NoSuchElementException();
+//		}
+//	}
 	
 	public List<Employee> findAll() {
 		return employeeRepository.findAll();
@@ -45,10 +44,7 @@ public abstract class AbstractEmployee implements EmployeeService {
 	}
 	
 	public List<Employee> getEmployeesWhoseSalaryIsGreaterThan(int salary) {
-		return employeeRepository.findAll()
-				.stream()
-				.filter(e -> e.getSalary() > salary)
-				.collect(Collectors.toList());
+		return employeeRepository.findBySalaryGreaterThan(salary);
 	}
 
 	public List<Employee> findByPosition(String position) {

@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import hu.webuni.hr.vargyasb.model.Employee;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long>{
+	
+	List<Employee> findBySalaryGreaterThan(int salary);
 
 	List<Employee> findByPosition(String position);
 	
