@@ -8,6 +8,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 public class Company {
 	
@@ -19,6 +21,7 @@ public class Company {
 	private String name;
 	private String address;
 	
+	//@JsonIgnore
 	@OneToMany(mappedBy = "company")
 	private List<Employee> employees = new ArrayList<>();
 

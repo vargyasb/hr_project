@@ -21,7 +21,7 @@ public class EmployeeDto {
 	@Past(message = "Start of Employment must be in the past")
 	private LocalDateTime startOfEmployment;
 	
-	private Company company;
+	//private Company company;
 
 	public EmployeeDto() {
 
@@ -75,11 +75,11 @@ public class EmployeeDto {
 		this.startOfEmployment = startOfEmployment;
 	}
 
-	public Company getCompany() {
-		return company;
-	}
-
-	public void setCompany(Company company) {
-		this.company = company;
-	}
+//	public Company getCompany() {
+//		return company;
+//	}
+//
+//	public void setCompany(Company company) {
+//		this.company = company;
+//	}
 }
