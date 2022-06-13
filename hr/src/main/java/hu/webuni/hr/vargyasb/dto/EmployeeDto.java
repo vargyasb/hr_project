@@ -4,33 +4,30 @@ import java.time.LocalDateTime;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 
-import hu.webuni.hr.vargyasb.model.Company;
+import hu.webuni.hr.vargyasb.model.Position;
 
 public class EmployeeDto {
 	private Long id;
 	@NotBlank
 	private String name;
 	@NotBlank
-	private String position;
+	private Position position;
 	@Min(value = 0, message = "Value must be positive")
 	private int salary;
 	@Past(message = "Start of Employment must be in the past")
 	private LocalDateTime startOfEmployment;
 	
-	//private Company company;
+	private CompanyDto company;
 
 	public EmployeeDto() {
 
 	}
 
-	public EmployeeDto(Long id, String name, String position, int salary, LocalDateTime localDateTime) {
+	public EmployeeDto(Long id, String name, int salary, LocalDateTime localDateTime) {
 		this.id = id;
 		this.name = name;
-		this.position = position;
 		this.salary = salary;
 		this.startOfEmployment = localDateTime;
 	}
@@ -51,11 +48,11 @@ public class EmployeeDto {
 		this.name = name;
 	}
 
-	public String getPosition() {
+	public Position getPosition() {
 		return position;
 	}
 
-	public void setPosition(String position) {
+	public void setPosition(Position position) {
 		this.position = position;
 	}
 
@@ -75,11 +72,11 @@ public class EmployeeDto {
 		this.startOfEmployment = startOfEmployment;
 	}
 
-//	public Company getCompany() {
-//		return company;
-//	}
-//
-//	public void setCompany(Company company) {
-//		this.company = company;
-//	}
+	public CompanyDto getCompany() {
+		return company;
+	}
+
+	public void setCompany(CompanyDto company) {
+		this.company = company;
+	}
 }

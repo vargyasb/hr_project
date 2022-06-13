@@ -15,7 +15,10 @@ public class Employee {
 	private Long id;
 	
 	private String name;
-	private String position;
+	
+	@ManyToOne
+	private Position position;
+	
 	private int salary;
 	private LocalDateTime startOfEmployment;
 	
@@ -26,10 +29,9 @@ public class Employee {
 
 	}
 
-	public Employee(Long id, String name, String position, int salary, LocalDateTime startOfEmployment) {
+	public Employee(Long id, String name, int salary, LocalDateTime startOfEmployment) {
 		this.id = id;
 		this.name = name;
-		this.position = position;
 		this.salary = salary;
 		this.startOfEmployment = startOfEmployment;
 	}
@@ -50,11 +52,11 @@ public class Employee {
 		this.name = name;
 	}
 
-	public String getPosition() {
+	public Position getPosition() {
 		return position;
 	}
 
-	public void setPosition(String position) {
+	public void setPosition(Position position) {
 		this.position = position;
 	}
 

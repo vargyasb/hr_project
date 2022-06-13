@@ -1,7 +1,6 @@
 package hu.webuni.hr.vargyasb.web;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -94,6 +93,16 @@ public class CompanyController {
 	public CompanyDto changeEmployees(@PathVariable long id, @RequestBody List<EmployeeDto> employees) {
 		findByIdOrThrowNotFound(id);
 		return companyMapper.companyToCompanyDto(companyService.replaceEmployees(id, employeeMapper.employeeDtosToemployees(employees)));
+	}
+	
+	@GetMapping("/findcompanybyemployeesalary")
+	public List<CompanyDto> findCompanyByEmployeeSalaryGreaterThan(@RequestParam int salary) {
+		return companyMapper.companiesToCompanyDtos(companyService.findCompanyByEmployeeSalaryGreaterThan(salary));
+	}
+	
+	@GetMapping("/wheremoreemployeesworkthan")
+	public List<CompanyDto> findCompaniesWhereMoreEmployeeWorksThan(@RequestParam long limit) {
+		return companyMapper.companiesToCompanyDtos(companyService.findCompaniesWhereMoreEmployeeWorksThan(limit));
 	}
 
 	private CompanyDto findByIdOrThrowNotFound(long id) {

@@ -69,6 +69,11 @@ public class CompanyService {
 		return company;
 	}
 	
-	//CompanyMappert updateli hogy employee-t is mappeljen
-	//mapperbe megirjuk azt is hogy mappelje a companykat ugy hogy kihagy employee-kat ha az isfull bevan kapcs
+	public List<Company> findCompanyByEmployeeSalaryGreaterThan(int salary) {
+		return companyRepository.findDistinctCompanyByEmployeesSalaryGreaterThan(salary);
+	}
+	
+	public List<Company> findCompaniesWhereMoreEmployeeWorksThan(long limit) {
+		return companyRepository.findCompaniesWhereMoreEmployeeWorksThan(limit);
+	}
 }

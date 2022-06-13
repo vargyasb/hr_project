@@ -2,7 +2,6 @@ package hu.webuni.hr.vargyasb.web;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import javax.validation.Valid;
 
@@ -24,6 +23,7 @@ import hu.webuni.hr.vargyasb.dto.EmployeeDto;
 import hu.webuni.hr.vargyasb.mapper.EmployeeMapper;
 import hu.webuni.hr.vargyasb.model.Employee;
 import hu.webuni.hr.vargyasb.service.EmployeeService;
+import hu.webuni.hr.vargyasb.service.IAvgSalaryByPosition;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -74,8 +74,9 @@ public class EmployeeController {
 	}
 
 	@GetMapping("/filter")
-	public List<EmployeeDto> getEmployeesWhoseSalaryIsGreaterThan(@RequestParam int salary) {
-		return employeeMapper.employeesToDtos(employeeService.getEmployeesWhoseSalaryIsGreaterThan(salary));
+	public List<EmployeeDto> getEmployeesWhoseSalaryIsGreaterThan(@RequestParam int salary,
+			@RequestParam(defaultValue = "0") Integer pageNr, @RequestParam(defaultValue = "5") Integer pageSize) {
+		return employeeMapper.employeesToDtos(employeeService.getEmployeesWhoseSalaryIsGreaterThan(salary, pageNr, pageSize));
 	}
 	
 	@PostMapping("/payRaise")
@@ -97,6 +98,11 @@ public class EmployeeController {
 	public List<EmployeeDto> getEmployeesByStartOfEmployment(@RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
 			@RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to) {
 		return employeeMapper.employeesToDtos(employeeService.findByStartOfEmploymentBetween(from, to));
+	}
+	
+	@GetMapping("/avgsalarybyposition")
+	public List<IAvgSalaryByPosition> averageDescSalaryByPositionInACompany(@RequestParam long companyId) {
+		return employeeService.averageDescSalaryByPositionInACompany(companyId);
 	}
 	
 	private EmployeeDto findByIdOrThrowNotFound(long id) {

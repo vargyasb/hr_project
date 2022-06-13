@@ -19,11 +19,13 @@ public interface EmployeeService {
 
 	void delete(Long id);
 	
-	List<Employee> getEmployeesWhoseSalaryIsGreaterThan(int salary);
+	List<Employee> getEmployeesWhoseSalaryIsGreaterThan(int salary, Integer pageNr, Integer pageSize);
 	
 	List<Employee> findByPosition(String position);
 	
 	List<Employee> findByNameStartingWithIgnoreCase(String keyword);
 	
 	List<Employee> findByStartOfEmploymentBetween(LocalDateTime from, LocalDateTime to);
+
+	List<IAvgSalaryByPosition> averageDescSalaryByPositionInACompany(long companyId);
 }

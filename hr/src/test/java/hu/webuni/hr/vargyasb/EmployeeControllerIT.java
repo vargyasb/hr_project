@@ -26,7 +26,7 @@ public class EmployeeControllerIT {
 	void testThatCreatedEmployeeIsListed() throws Exception {
 		List<EmployeeDto> employeesBefore = getEmployees();
 		
-		EmployeeDto employee = new EmployeeDto(5L, "Teszt Elek", "Főhős", 9999, LocalDateTime.of(2010, 10, 13, 10, 25));
+		EmployeeDto employee = new EmployeeDto(5L, "Teszt Elek", 9999, LocalDateTime.of(2010, 10, 13, 10, 25));
 		createEmployee(employee);
 		
 		List<EmployeeDto> employeesAfter = getEmployees();
@@ -44,7 +44,7 @@ public class EmployeeControllerIT {
 	void testThatCreatedEmployeeIsListed_WithWrongInput() throws Exception {
 		List<EmployeeDto> employeesBefore = getEmployees();
 		
-		EmployeeDto employee = new EmployeeDto(5L, "Teszt Elek", null, 9999, LocalDateTime.of(2010, 10, 13, 10, 25));
+		EmployeeDto employee = new EmployeeDto(5L, "Teszt Elek", 9999, LocalDateTime.of(2010, 10, 13, 10, 25));
 		createEmployeeWithBadRequestStatus(employee);
 		
 		List<EmployeeDto> employeesAfter = getEmployees();
@@ -60,7 +60,7 @@ public class EmployeeControllerIT {
 	
 	@Test
 	void testThatEmployeeIsModified() throws Exception {
-		EmployeeDto employee = new EmployeeDto(5L, "Teszt Elek", "Főhős", 9999, LocalDateTime.of(2010, 10, 13, 10, 25));
+		EmployeeDto employee = new EmployeeDto(5L, "Teszt Elek", 9999, LocalDateTime.of(2010, 10, 13, 10, 25));
 		
 		EmployeeDto modifiedEmployee = modifyEmployee(employee);
 		
@@ -71,7 +71,7 @@ public class EmployeeControllerIT {
 
 	@Test
 	void testThatEmployeeIsModified_WithWrongInput() throws Exception {
-		EmployeeDto employee = new EmployeeDto(5L, "", "Főhős", 9999, LocalDateTime.of(2010, 10, 13, 10, 25));
+		EmployeeDto employee = new EmployeeDto(5L, "", 9999, LocalDateTime.of(2010, 10, 13, 10, 25));
 		
 		EmployeeDto employeeToModify = getEmployeeById(employee.getId());
 		

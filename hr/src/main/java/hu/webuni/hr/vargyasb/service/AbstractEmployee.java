@@ -1,11 +1,14 @@
 package hu.webuni.hr.vargyasb.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import hu.webuni.hr.vargyasb.model.Employee;
@@ -43,8 +46,16 @@ public abstract class AbstractEmployee implements EmployeeService {
 		employeeRepository.deleteById(id);
 	}
 	
-	public List<Employee> getEmployeesWhoseSalaryIsGreaterThan(int salary) {
-		return employeeRepository.findBySalaryGreaterThan(salary);
+	public List<Employee> getEmployeesWhoseSalaryIsGreaterThan(int salary, Integer pageNr, Integer pageSize) {
+		Pageable paging = PageRequest.of(pageNr, pageSize);
+		Page<Employee> pagedResult = employeeRepository.findBySalaryGreaterThan(salary, paging);
+		
+//		return employeeRepository.findBySalaryGreaterThan(salary, paging);
+		if (pagedResult.hasContent()) {
+			return pagedResult.getContent();
+		} else {
+			return new ArrayList<Employee>();
+		}
 	}
 
 	public List<Employee> findByPosition(String position) {
@@ -59,5 +70,7 @@ public abstract class AbstractEmployee implements EmployeeService {
 		return employeeRepository.findByStartOfEmploymentBetween(from, to);
 	}
 	
-	
+	public List<IAvgSalaryByPosition> averageDescSalaryByPositionInACompany(long companyId) {
+		return employeeRepository.averageDescSalaryByPositionInACompany(companyId);
+	}
 }

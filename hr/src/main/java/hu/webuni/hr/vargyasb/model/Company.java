@@ -6,9 +6,8 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Company {
@@ -20,16 +19,21 @@ public class Company {
 	private String registrationNumber;
 	private String name;
 	private String address;
+//	private CompanyTypeEnum companyType;
+	
+	@ManyToOne
+	private CompanyType companyType;
 	
 	//@JsonIgnore
 	@OneToMany(mappedBy = "company")
 	private List<Employee> employees = new ArrayList<>();
 
-	public Company(Long id, String registrationNumber, String name, String address) {
+	public Company(Long id, String registrationNumber, String name, String address, CompanyType companyType) {
 		this.id = id;
 		this.registrationNumber = registrationNumber;
 		this.name = name;
 		this.address = address;
+		this.companyType = companyType;
 	}
 
 	public Company() {
@@ -106,4 +110,21 @@ public class Company {
 		return true;
 	}
 
+	public CompanyType getCompanyType() {
+		return companyType;
+	}
+
+	public void setCompanyType(CompanyType companyType) {
+		this.companyType = companyType;
+	}
+
+//	public CompanyTypeEnum getCompanyType() {
+//		return companyType;
+//	}
+//
+//	public void setCompanyType(CompanyTypeEnum companyType) {
+//		this.companyType = companyType;
+//	}
+
+	
 }
