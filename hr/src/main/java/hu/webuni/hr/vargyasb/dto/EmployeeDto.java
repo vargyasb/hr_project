@@ -13,7 +13,7 @@ public class EmployeeDto {
 	@NotBlank
 	private String name;
 	@NotBlank
-	private Position position;
+	private String position;
 	@Min(value = 0, message = "Value must be positive")
 	private int salary;
 	@Past(message = "Start of Employment must be in the past")
@@ -48,11 +48,11 @@ public class EmployeeDto {
 		this.name = name;
 	}
 
-	public Position getPosition() {
+	public String getPosition() {
 		return position;
 	}
 
-	public void setPosition(Position position) {
+	public void setPosition(String position) {
 		this.position = position;
 	}
 

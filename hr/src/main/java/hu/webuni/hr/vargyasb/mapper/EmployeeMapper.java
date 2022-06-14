@@ -1,8 +1,8 @@
 package hu.webuni.hr.vargyasb.mapper;
 
-import java.lang.annotation.Target;
 import java.util.List;
 
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -16,8 +16,11 @@ public interface EmployeeMapper {
 	
 	List<Employee> employeeDtosToemployees(List<EmployeeDto> employeesDtos);
 	
-	@Mapping(target = "company", ignore = true)
+	@Mapping(target = "company.employees", ignore = true)
+	@Mapping(target = "company.companyType.companies", ignore = true)
+	@Mapping(target = "position", source="position.name")
 	EmployeeDto employeeToDto(Employee employee);
 	
+	@InheritInverseConfiguration
 	Employee employeeDtoToEmployee(EmployeeDto employeeDto);
 }
