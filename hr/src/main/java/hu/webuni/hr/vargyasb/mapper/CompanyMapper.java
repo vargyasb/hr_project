@@ -16,6 +16,7 @@ public interface CompanyMapper {
 	CompanyDto companyToCompanyDto(Company company);
 	List<CompanyDto> companiesToCompanyDtos(List<Company> companies);
 	
+	Company companyDtoToCompany(CompanyDto companyDto);
 	List<Company> companyDtosToCompanies(List<CompanyDto> companyDtos);
 	
 	@Named("summary")
@@ -25,5 +26,4 @@ public interface CompanyMapper {
 	@IterableMapping(qualifiedByName = "summary")
 	List<CompanyDto> companiesToCompanyDtosWithNoEmployees(List<Company> companies);
 	
-	Company companyDtoToCompany(CompanyDto companyDto);
 }
