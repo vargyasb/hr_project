@@ -3,6 +3,7 @@ package hu.webuni.hr.vargyasb.mapper;
 import java.util.List;
 
 import org.mapstruct.IterableMapping;
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -13,16 +14,15 @@ import hu.webuni.hr.vargyasb.model.Employee;
 @Mapper(componentModel = "spring")
 public interface EmployeeMapper {
 	
-	EmployeeDto employeeToDto(Employee employee);
 	List<EmployeeDto> employeesToDtos(List<Employee> employees);
 	
-	Employee employeeDtoToEmployee(EmployeeDto employeeDto);
 	List<Employee> employeeDtosToemployees(List<EmployeeDto> employeesDtos);
+
+	@Mapping(target = "company.employees", ignore = true)
+	@Mapping(target = "company.companyType.companies", ignore = true)
+	@Mapping(target = "position", source="position.name")
+	EmployeeDto employeeToDto(Employee employee);
 	
-	@Named("summary")
-	@Mapping(target = "company", ignore = true)
-	EmployeeDto employeeToDtoWithoutCompany(Employee employee);
-	
-	@IterableMapping(qualifiedByName = "summary")
-	List<EmployeeDto> employeestoDtosWithoutCompany(List<Employee> employees);
+	@InheritInverseConfiguration
+	Employee employeeDtoToEmployee(EmployeeDto employeeDto);
 }
