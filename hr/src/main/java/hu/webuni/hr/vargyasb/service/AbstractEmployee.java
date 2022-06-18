@@ -10,17 +10,39 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import hu.webuni.hr.vargyasb.model.Employee;
+import hu.webuni.hr.vargyasb.model.Position;
 import hu.webuni.hr.vargyasb.repository.EmployeeRepository;
+import hu.webuni.hr.vargyasb.repository.PositionRepository;
 
 public abstract class AbstractEmployee implements EmployeeService {
 
 	@Autowired
 	EmployeeRepository employeeRepository;
 	
+	@Autowired
+	PositionRepository positionRepository;
+	
 	@Transactional
 	public Employee save(Employee employee) {
+		Position position = employee.getPosition();
+		if (position != null) {
+			String positionName = position.getName();
+			if (!ObjectUtils.isEmpty(positionName)) {
+				Position positionInDb = null;
+				Optional<Position> foundPosition = positionRepository.findByName(positionName);
+				if (foundPosition.isPresent()) {
+					positionInDb = foundPosition.get();
+				} else {
+					positionInDb = positionRepository.save(position);
+				}
+				employee.setPosition(positionInDb);
+			} else {
+				employee.setPosition(null);
+			}
+		}
 		return employeeRepository.save(employee);
 	}
 	
@@ -33,8 +55,8 @@ public abstract class AbstractEmployee implements EmployeeService {
 //		}
 //	}
 	
-	public List<Employee> findAll() {
-		return employeeRepository.findAll();
+	public Page<Employee> findAll(Pageable pageable) {
+		return employeeRepository.findAll(pageable);
 	}
 	
 	public Optional<Employee> findById(Long id) {
@@ -59,7 +81,7 @@ public abstract class AbstractEmployee implements EmployeeService {
 	}
 
 	public List<Employee> findByPosition(String position) {
-		return employeeRepository.findByPosition(position);
+		return employeeRepository.findByPositionName(position);
 	}
 
 	public List<Employee> findByNameStartingWithIgnoreCase(String keyword) {
@@ -70,7 +92,4 @@ public abstract class AbstractEmployee implements EmployeeService {
 		return employeeRepository.findByStartOfEmploymentBetween(from, to);
 	}
 	
-	public List<IAvgSalaryByPosition> averageDescSalaryByPositionInACompany(long companyId) {
-		return employeeRepository.averageDescSalaryByPositionInACompany(companyId);
-	}
 }

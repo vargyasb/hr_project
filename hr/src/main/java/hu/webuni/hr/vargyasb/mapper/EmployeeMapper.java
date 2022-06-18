@@ -2,11 +2,9 @@ package hu.webuni.hr.vargyasb.mapper;
 
 import java.util.List;
 
-import org.mapstruct.IterableMapping;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 
 import hu.webuni.hr.vargyasb.dto.EmployeeDto;
 import hu.webuni.hr.vargyasb.model.Employee;

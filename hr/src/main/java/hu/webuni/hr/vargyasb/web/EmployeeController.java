@@ -6,6 +6,8 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,7 +25,6 @@ import hu.webuni.hr.vargyasb.dto.EmployeeDto;
 import hu.webuni.hr.vargyasb.mapper.EmployeeMapper;
 import hu.webuni.hr.vargyasb.model.Employee;
 import hu.webuni.hr.vargyasb.service.EmployeeService;
-import hu.webuni.hr.vargyasb.service.IAvgSalaryByPosition;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -36,8 +37,8 @@ public class EmployeeController {
 	private EmployeeMapper employeeMapper;
 	
 	@GetMapping
-	public List<EmployeeDto> getAll() {
-		return employeeMapper.employeesToDtos(employeeService.findAll());
+	public List<EmployeeDto> getAll(Pageable pageable) {
+		return employeeMapper.employeesToDtos(employeeService.findAll(pageable).getContent());
 	}
 
 	@GetMapping("/{id}")
@@ -73,7 +74,7 @@ public class EmployeeController {
 		employeeService.delete(id);
 	}
 
-	@GetMapping("/filter")
+	@GetMapping(params = "minSalary")
 	public List<EmployeeDto> getEmployeesWhoseSalaryIsGreaterThan(@RequestParam int salary,
 			@RequestParam(defaultValue = "0") Integer pageNr, @RequestParam(defaultValue = "5") Integer pageSize) {
 		return employeeMapper.employeesToDtos(employeeService.getEmployeesWhoseSalaryIsGreaterThan(salary, pageNr, pageSize));
@@ -84,25 +85,20 @@ public class EmployeeController {
 		return employeeService.getPayRaisePercent(employeeMapper.employeeDtoToEmployee(employeeDto));
 	}
 	
-	@GetMapping("/filterbyposition")
+	@GetMapping(params = "position")
 	public List<EmployeeDto> getEmployeesByPosition(@RequestParam String position) {
 		return employeeMapper.employeesToDtos(employeeService.findByPosition(position));
 	}
 	
-	@GetMapping("/filterbyname")
-	public List<EmployeeDto> getEmployeesNameStartingWith(@RequestParam String keyword) {
-		return employeeMapper.employeesToDtos(employeeService.findByNameStartingWithIgnoreCase(keyword));
+	@GetMapping(params = "name")
+	public List<EmployeeDto> getEmployeesNameStartingWith(@RequestParam String name) {
+		return employeeMapper.employeesToDtos(employeeService.findByNameStartingWithIgnoreCase(name));
 	}
 	
-	@GetMapping("/filterbystartdate")
+	@GetMapping(params = {"from", "to"})
 	public List<EmployeeDto> getEmployeesByStartOfEmployment(@RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
 			@RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to) {
 		return employeeMapper.employeesToDtos(employeeService.findByStartOfEmploymentBetween(from, to));
-	}
-	
-	@GetMapping("/avgsalarybyposition")
-	public List<IAvgSalaryByPosition> averageDescSalaryByPositionInACompany(@RequestParam long companyId) {
-		return employeeService.averageDescSalaryByPositionInACompany(companyId);
 	}
 	
 	private EmployeeDto findByIdOrThrowNotFound(long id) {

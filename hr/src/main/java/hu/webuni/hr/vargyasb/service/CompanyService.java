@@ -21,6 +21,9 @@ public class CompanyService {
 	@Autowired
 	EmployeeRepository employeeRepository;
 	
+	@Autowired
+	EmployeeService employeeService;
+	
 	@Transactional
 	public Company save(Company company) {
 		return companyRepository.save(company);
@@ -43,7 +46,7 @@ public class CompanyService {
 		Company company = companyRepository.findById(id).get();
 		company.addEmployee(employee);
 		
-		employeeRepository.save(employee);
+		employeeService.save(employee);
 		return company;
 	}
 	
@@ -51,8 +54,9 @@ public class CompanyService {
 		Company company = companyRepository.findById(id).get();
 		Employee employee = employeeRepository.findById(employeeId).get();
 		employee.setCompany(null);
+		employee.setPosition(null);
 		company.getEmployees().remove(employee);
-		employeeRepository.save(employee);
+		employeeService.save(employee);
 		return company;
 	}
 	
@@ -60,11 +64,12 @@ public class CompanyService {
 		Company company = companyRepository.findById(id).get();
 		for (Employee employee : company.getEmployees()) {
 			employee.setCompany(null);
+			employee.setPosition(null);
 		}
 		company.getEmployees().clear();
 		for (Employee employee : employees) {
 			company.addEmployee(employee);
-			employeeRepository.save(employee);
+			employeeService.save(employee);
 		}
 		return company;
 	}
@@ -75,5 +80,9 @@ public class CompanyService {
 	
 	public List<Company> findCompaniesWhereMoreEmployeeWorksThan(long limit) {
 		return companyRepository.findCompaniesWhereMoreEmployeeWorksThan(limit);
+	}
+	
+	public List<IAvgSalaryByPosition> averageDescSalaryByPositionInACompany(long companyId) {
+		return companyRepository.averageDescSalaryByPositionInACompany(companyId);
 	}
 }

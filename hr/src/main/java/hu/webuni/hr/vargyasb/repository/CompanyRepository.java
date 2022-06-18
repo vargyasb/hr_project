@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import hu.webuni.hr.vargyasb.model.Company;
+import hu.webuni.hr.vargyasb.service.IAvgSalaryByPosition;
 
 public interface CompanyRepository extends JpaRepository<Company, Long>{
 
@@ -16,4 +17,7 @@ public interface CompanyRepository extends JpaRepository<Company, Long>{
 			+ "JOIN Employee e ON e.company = c.id GROUP BY c.id HAVING COUNT(e.id) > :limit")
 	List<Company> findCompaniesWhereMoreEmployeeWorksThan(@Param("limit") long limit);
 	
+	@Query(value = "SELECT e.position.name AS position, AVG(e.salary) AS averageSalary FROM Employee e JOIN Company c ON e.company = c.id"
+			+ " WHERE c.id = :companyId GROUP BY e.position.name ORDER BY AVG(e.salary) DESC")
+	List<IAvgSalaryByPosition> averageDescSalaryByPositionInACompany(long companyId);
 }

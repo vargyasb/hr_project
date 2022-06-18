@@ -21,6 +21,7 @@ import hu.webuni.hr.vargyasb.mapper.CompanyMapper;
 import hu.webuni.hr.vargyasb.mapper.EmployeeMapper;
 import hu.webuni.hr.vargyasb.model.Company;
 import hu.webuni.hr.vargyasb.service.CompanyService;
+import hu.webuni.hr.vargyasb.service.IAvgSalaryByPosition;
 
 @RestController
 @RequestMapping("api/companies")
@@ -38,11 +39,7 @@ public class CompanyController {
 	@GetMapping
 	public List<CompanyDto> getAll(@RequestParam(required = false) Boolean full) {
 		List<Company> companies = companyService.findAll();
-		if (isFull(full)) {
-			return companyMapper.companiesToCompanyDtos(companies);
-		} else {
-			return companyMapper.companiesToCompanyDtosWithNoEmployees(companies);
-		}
+		return mapCompanies(companies, full);
 	}
 
 	@GetMapping("/{id}")
@@ -95,14 +92,21 @@ public class CompanyController {
 		return companyMapper.companyToCompanyDto(companyService.replaceEmployees(id, employeeMapper.employeeDtosToemployees(employees)));
 	}
 	
-	@GetMapping("/findcompanybyemployeesalary")
-	public List<CompanyDto> findCompanyByEmployeeSalaryGreaterThan(@RequestParam int salary) {
-		return companyMapper.companiesToCompanyDtos(companyService.findCompanyByEmployeeSalaryGreaterThan(salary));
+	@GetMapping(params = "minSalary")
+	public List<CompanyDto> findCompanyByEmployeeSalaryGreaterThan(@RequestParam int minSalary, @RequestParam(required = false) boolean full) {
+		List<Company> companies = companyService.findCompanyByEmployeeSalaryGreaterThan(minSalary);
+		return mapCompanies(companies, full);
 	}
 	
-	@GetMapping("/wheremoreemployeesworkthan")
-	public List<CompanyDto> findCompaniesWhereMoreEmployeeWorksThan(@RequestParam long limit) {
-		return companyMapper.companiesToCompanyDtos(companyService.findCompaniesWhereMoreEmployeeWorksThan(limit));
+	@GetMapping(params = "employeeLimit")
+	public List<CompanyDto> findCompaniesWhereMoreEmployeeWorksThan(@RequestParam long employeeLimit, @RequestParam(required = false) boolean full) {
+		List<Company> companies = companyService.findCompaniesWhereMoreEmployeeWorksThan(employeeLimit);
+		return mapCompanies(companies, full);
+	}
+	
+	@GetMapping("/{id}/avgsalarybyposition")
+	public List<IAvgSalaryByPosition> averageDescSalaryByPositionInACompany(@PathVariable long id) {
+		return companyService.averageDescSalaryByPositionInACompany(id);
 	}
 
 	private CompanyDto findByIdOrThrowNotFound(long id) {
@@ -113,6 +117,14 @@ public class CompanyController {
 
 	private boolean isFull(Boolean full) {
 		return full != null && full;
+	}
+	
+	private List<CompanyDto> mapCompanies(List<Company> companies, Boolean full) {
+		if (isFull(full)) {
+			return companyMapper.companiesToCompanyDtos(companies);
+		} else {
+			return companyMapper.companiesToCompanyDtosWithNoEmployees(companies);
+		}
 	}
 	
 }
