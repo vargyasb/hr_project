@@ -38,7 +38,12 @@ public class CompanyController {
 
 	@GetMapping
 	public List<CompanyDto> getAll(@RequestParam(required = false) Boolean full) {
-		List<Company> companies = companyService.findAll();
+		List<Company> companies = null;
+		if (isFull(full)) 
+			companies = companyService.findAllWithEmployees();
+		else
+			companies = companyService.findAll();
+		
 		return mapCompanies(companies, full);
 	}
 

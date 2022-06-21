@@ -2,6 +2,7 @@ package hu.webuni.hr.vargyasb.repository;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,4 +21,10 @@ public interface CompanyRepository extends JpaRepository<Company, Long>{
 	@Query(value = "SELECT e.position.name AS position, AVG(e.salary) AS averageSalary FROM Employee e JOIN Company c ON e.company = c.id"
 			+ " WHERE c.id = :companyId GROUP BY e.position.name ORDER BY AVG(e.salary) DESC")
 	List<IAvgSalaryByPosition> averageDescSalaryByPositionInACompany(long companyId);
+
+	//@Query("SELECT DISTINCT c FROM Company c LEFT JOIN FETCH c.employees")
+	@EntityGraph(attributePaths = {"employees", /* "companyType", */"employees.position"})
+	//@EntityGraph("Company.full")
+	@Query("SELECT c FROM Company c")
+	List<Company> findAllWithEmployees();
 }
