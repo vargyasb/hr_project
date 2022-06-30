@@ -49,12 +49,15 @@ public class CompanyController {
 
 	@GetMapping("/{id}")
 	public CompanyDto findById(@PathVariable long id, @RequestParam(required = false) Boolean full) {
-		Company company = companyMapper.companyDtoToCompany(findByIdOrThrowNotFound(id));
+		//Company company = companyMapper.companyDtoToCompany(findByIdOrThrowNotFound(id));
+		Company company = null;
 		if (isFull(full)) {
-			return companyMapper.companyToCompanyDto(company);
+			company = companyService.findByIdWithEmployees(id).get();
 		} else {
-			return companyMapper.companyToCompanyDtoWithNoEmployees(company); 
+			company = companyService.findById(id).get();
 		}
+		
+		return mapCompany(company, full);
 	}
 
 	@PostMapping
@@ -70,7 +73,8 @@ public class CompanyController {
 		
 		companyDto.setId(id);
 		Company company = companyService.save(companyMapper.companyDtoToCompany(companyDto));
-		return companyMapper.companyToCompanyDto(company);
+//		return companyMapper.companyToCompanyDto(company);
+		return companyMapper.companyToCompanyDtoWithNoEmployees(company);
 	}
 
 	@DeleteMapping("/{id}")
@@ -115,7 +119,7 @@ public class CompanyController {
 	}
 
 	private CompanyDto findByIdOrThrowNotFound(long id) {
-		Company company = companyService.findById(id)
+		Company company = companyService.findByIdWithEmployees(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 		return companyMapper.companyToCompanyDto(company);
 	}
@@ -130,6 +134,13 @@ public class CompanyController {
 		} else {
 			return companyMapper.companiesToCompanyDtosWithNoEmployees(companies);
 		}
+	}
+	
+	private CompanyDto mapCompany(Company company, Boolean full) {
+		if (isFull(full))
+			return companyMapper.companyToCompanyDto(company);
+		else
+			return companyMapper.companyToCompanyDtoWithNoEmployees(company);
 	}
 	
 }

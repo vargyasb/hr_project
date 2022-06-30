@@ -31,6 +31,13 @@ public class EmployeeDto {
 		this.salary = salary;
 		this.startOfEmployment = localDateTime;
 	}
+	
+	public EmployeeDto(String name, int salary, String position, LocalDateTime localDateTime) {
+		this.name = name;
+		this.position = position;
+		this.salary = salary;
+		this.startOfEmployment = localDateTime;
+	}
 
 	public Long getId() {
 		return id;

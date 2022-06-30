@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import hu.webuni.hr.vargyasb.model.Employee;
 import hu.webuni.hr.vargyasb.service.IAvgSalaryByPosition;
 
-public interface EmployeeRepository extends JpaRepository<Employee, Long>{
+public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSpecificationExecutor<Employee>{
 	
 	Page<Employee> findBySalaryGreaterThan(int salary, Pageable pageable);
 
@@ -43,4 +44,5 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>{
 			+ ")")
 	int updateSalaries(String position, int minSalary, long companyId);
 
+	
 }

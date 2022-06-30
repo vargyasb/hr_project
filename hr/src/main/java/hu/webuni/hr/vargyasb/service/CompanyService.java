@@ -41,13 +41,18 @@ public class CompanyService {
 		return companyRepository.findById(id);
 	}
 	
+	public Optional<Company> findByIdWithEmployees(Long id) {
+		return companyRepository.findByIdWithEmployees(id);
+	}
+	
 	@Transactional
 	public void delete(Long id) {
 		companyRepository.deleteById(id);
 	}
 	
+	@Transactional
 	public Company addEmployee(long id, Employee employee) {
-		Company company = companyRepository.findById(id).get();
+		Company company = companyRepository.findByIdWithEmployees(id).get();
 		company.addEmployee(employee);
 		
 		employeeService.save(employee);
@@ -55,7 +60,7 @@ public class CompanyService {
 	}
 	
 	public Company deleteEmployee(long id, long employeeId) {
-		Company company = companyRepository.findById(id).get();
+		Company company = companyRepository.findByIdWithEmployees(id).get();
 		Employee employee = employeeRepository.findById(employeeId).get();
 		employee.setCompany(null);
 		employee.setPosition(null);
@@ -64,11 +69,13 @@ public class CompanyService {
 		return company;
 	}
 	
+	@Transactional
 	public Company replaceEmployees(long id, List<Employee> employees) {
-		Company company = companyRepository.findById(id).get();
+		Company company = companyRepository.findByIdWithEmployees(id).get();
 		for (Employee employee : company.getEmployees()) {
 			employee.setCompany(null);
 			employee.setPosition(null);
+			employeeService.save(employee);
 		}
 		company.getEmployees().clear();
 		for (Employee employee : employees) {

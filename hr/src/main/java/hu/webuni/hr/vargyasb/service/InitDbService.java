@@ -50,11 +50,11 @@ public class InitDbService {
 		CompanyType bt = new CompanyType("BT");
 		companyTypeRepository.save(bt);
 		
-		Company udemy = new Company(null, "111", "Udemy", "First str 2", zrt);
+		Company udemy = new Company("111", "Udemy", "First str 2");
 		setCompanyTypeAndSaveCompanyToRepository(udemy, zrt);
-		Company webuni = new Company(null, "222", "Webuni", "Second str 1", kft);
+		Company webuni = new Company("222", "Webuni", "Second str 1");
 		setCompanyTypeAndSaveCompanyToRepository(webuni, kft);
-		Company tipikMagyar = new Company(null, "333", "Tipik Magyar Kft", "Fő utca 3", kft);
+		Company tipikMagyar = new Company("333", "Tipik Magyar Kft", "Fő utca 3");
 		setCompanyTypeAndSaveCompanyToRepository(tipikMagyar, kft);
 		
 		
@@ -66,21 +66,21 @@ public class InitDbService {
 		positionRepository.save(springDev);
 		positionRepository.save(fullStackDev);
 		
-		setCompanyAndSaveToRepository(new Employee(null, "Tim Buchalka", /*pozicio volt itt,*/1209, LocalDateTime.of(2016, 05, 22, 10, 10)), udemy, javaDev);
-		setCompanyAndSaveToRepository(new Employee(null, "John Thompson", /*pozicio volt itt,*/1899, LocalDateTime.of(2018, 11, 22, 10, 10)), udemy, springDev);
-		setCompanyAndSaveToRepository(new Employee(null, "Chad Darby", /*pozicio volt itt,*/2100, LocalDateTime.of(2017, 11, 22, 10, 10)), udemy, springDev);
-		setCompanyAndSaveToRepository(new Employee(null, "Colt Steele", /*pozicio volt itt,*/1899, LocalDateTime.of(2018, 11, 22, 10, 10)), udemy, fullStackDev);
-		setCompanyAndSaveToRepository(new Employee(null, "Goran Lochert", /*pozicio volt itt,*/1399, LocalDateTime.of(2018, 11, 22, 10, 10)), udemy, javaDev);		
+		setCompanyAndSaveToRepository(new Employee("Tim Buchalka", /*pozicio volt itt,*/1209, LocalDateTime.of(2016, 05, 22, 10, 10)), udemy, javaDev);
+		setCompanyAndSaveToRepository(new Employee("John Thompson", /*pozicio volt itt,*/1899, LocalDateTime.of(2018, 11, 22, 10, 10)), udemy, springDev);
+		setCompanyAndSaveToRepository(new Employee("Chad Darby", /*pozicio volt itt,*/2100, LocalDateTime.of(2017, 11, 22, 10, 10)), udemy, springDev);
+		setCompanyAndSaveToRepository(new Employee("Colt Steele", /*pozicio volt itt,*/1899, LocalDateTime.of(2018, 11, 22, 10, 10)), udemy, fullStackDev);
+		setCompanyAndSaveToRepository(new Employee("Goran Lochert", /*pozicio volt itt,*/1399, LocalDateTime.of(2018, 11, 22, 10, 10)), udemy, javaDev);		
 		
 		Position angularTeacher = new Position("Angular Teacher", "főiskola", 1100);
 		Position reactTeacher = new Position("React Teacher", "főiskola", 1100);
 		positionRepository.save(angularTeacher);
 		positionRepository.save(reactTeacher);
 		
-		setCompanyAndSaveToRepository(new Employee(null, "Oktató 1", /*pozicio volt itt,*/1123, LocalDateTime.of(2021, 04, 21, 22, 01)), webuni, angularTeacher);
-		setCompanyAndSaveToRepository(new Employee(null, "Oktató 2", /*pozicio volt itt,*/1333, LocalDateTime.of(2022, 04, 21, 22, 01)), webuni, reactTeacher);
-		setCompanyAndSaveToRepository(new Employee(null, "Oktató 3 ", /*pozicio volt itt,*/1400, LocalDateTime.of(2018, 04, 21, 22, 01)), webuni, angularTeacher);
-		setCompanyAndSaveToRepository(new Employee(null, "Oktató 4", /*pozicio volt itt,*/1111, LocalDateTime.of(2019, 04, 21, 22, 01)), webuni, reactTeacher);
+		setCompanyAndSaveToRepository(new Employee("Oktató 1", /*pozicio volt itt,*/1123, LocalDateTime.of(2021, 04, 21, 22, 01)), webuni, angularTeacher);
+		setCompanyAndSaveToRepository(new Employee("Oktató 2", /*pozicio volt itt,*/1333, LocalDateTime.of(2022, 04, 21, 22, 01)), webuni, reactTeacher);
+		setCompanyAndSaveToRepository(new Employee("Oktató 3 ", /*pozicio volt itt,*/1400, LocalDateTime.of(2018, 04, 21, 22, 01)), webuni, angularTeacher);
+		setCompanyAndSaveToRepository(new Employee("Oktató 4", /*pozicio volt itt,*/1111, LocalDateTime.of(2019, 04, 21, 22, 01)), webuni, reactTeacher);
 		
 		Position logMunkatars = new Position("Logisztikai munkatárs", "érettségi", 900);
 		Position itEngineer = new Position("IT Engineer", "egyetem", 1900);
@@ -92,19 +92,19 @@ public class InitDbService {
 		positionRepository.save(munkas);
 		
 		
-		setCompanyAndSaveToRepository(new Employee(null, "Nagy Árpi", /*pozicio volt itt,*/1999, LocalDateTime.of(2010, 10, 13, 10, 25)), tipikMagyar, logMunkatars);
-		setCompanyAndSaveToRepository(new Employee(null, "Kiss Jenő", /*pozicio volt itt,*/3888, LocalDateTime.of(2012, 06, 13, 10, 25)), tipikMagyar, itEngineer);
-		setCompanyAndSaveToRepository(new Employee(null, "Kovács János", /*pozicio volt itt,*/1255, LocalDateTime.of(2015, 03, 13, 10, 25)), tipikMagyar, munkas);
-		setCompanyAndSaveToRepository(new Employee(null, "Horváth Géza", /*pozicio volt itt,*/1100, LocalDateTime.of(2016, 03, 13, 10, 25)), tipikMagyar, logMunkatars);
-		setCompanyAndSaveToRepository(new Employee(null, "Varga Sándor", /*pozicio volt itt,*/3000, LocalDateTime.of(2017, 03, 13, 10, 25)), tipikMagyar, itEngineer);
-		setCompanyAndSaveToRepository(new Employee(null, "Tamás István", /*pozicio volt itt,*/2500, LocalDateTime.of(2014, 03, 13, 10, 25)), tipikMagyar, itEngineer);
-		setCompanyAndSaveToRepository(new Employee(null, "Laci", /*pozicio volt itt,*/800, LocalDateTime.of(2015, 03, 13, 10, 25)), tipikMagyar, munkas);
-		setCompanyAndSaveToRepository(new Employee(null, "Tóth Péter", /*pozicio volt itt,*/2000, LocalDateTime.of(2020, 03, 13, 10, 25)), tipikMagyar, belsoEllenor);
-		setCompanyAndSaveToRepository(new Employee(null, "Németh Endre", /*pozicio volt itt,*/2222, LocalDateTime.of(2022, 03, 13, 10, 25)), tipikMagyar, itEngineer);
-		setCompanyAndSaveToRepository(new Employee(null, "Takács Benedek", /*pozicio volt itt,*/1111, LocalDateTime.of(2008, 03, 13, 10, 25)), tipikMagyar, logMunkatars);
-		setCompanyAndSaveToRepository(new Employee(null, "Kiss Balázs", /*pozicio volt itt,*/1400, LocalDateTime.of(2010, 03, 13, 10, 25)), tipikMagyar, belsoEllenor);
-		setCompanyAndSaveToRepository(new Employee(null, "Pista", /*pozicio volt itt,*/987, LocalDateTime.of(1987, 03, 13, 10, 25)), tipikMagyar, munkas);
-		setCompanyAndSaveToRepository(new Employee(null, "Józsi", /*pozicio volt itt,*/887, LocalDateTime.of(1986, 03, 13, 10, 25)), tipikMagyar, munkas);
+		setCompanyAndSaveToRepository(new Employee("Nagy Árpi", /*pozicio volt itt,*/1999, LocalDateTime.of(2010, 10, 13, 10, 25)), tipikMagyar, logMunkatars);
+		setCompanyAndSaveToRepository(new Employee("Kiss Jenő", /*pozicio volt itt,*/3888, LocalDateTime.of(2012, 06, 13, 10, 25)), tipikMagyar, itEngineer);
+		setCompanyAndSaveToRepository(new Employee("Kovács János", /*pozicio volt itt,*/1255, LocalDateTime.of(2015, 03, 13, 10, 25)), tipikMagyar, munkas);
+		setCompanyAndSaveToRepository(new Employee("Horváth Géza", /*pozicio volt itt,*/1100, LocalDateTime.of(2016, 03, 13, 10, 25)), tipikMagyar, logMunkatars);
+		setCompanyAndSaveToRepository(new Employee("Varga Sándor", /*pozicio volt itt,*/3000, LocalDateTime.of(2017, 03, 13, 10, 25)), tipikMagyar, itEngineer);
+		setCompanyAndSaveToRepository(new Employee("Tamás István", /*pozicio volt itt,*/2500, LocalDateTime.of(2014, 03, 13, 10, 25)), tipikMagyar, itEngineer);
+		setCompanyAndSaveToRepository(new Employee("Laci", /*pozicio volt itt,*/800, LocalDateTime.of(2015, 03, 13, 10, 25)), tipikMagyar, munkas);
+		setCompanyAndSaveToRepository(new Employee("Tóth Péter", /*pozicio volt itt,*/2000, LocalDateTime.of(2020, 03, 13, 10, 25)), tipikMagyar, belsoEllenor);
+		setCompanyAndSaveToRepository(new Employee("Németh Endre", /*pozicio volt itt,*/2222, LocalDateTime.of(2022, 03, 13, 10, 25)), tipikMagyar, itEngineer);
+		setCompanyAndSaveToRepository(new Employee("Takács Benedek", /*pozicio volt itt,*/1111, LocalDateTime.of(2008, 03, 13, 10, 25)), tipikMagyar, logMunkatars);
+		setCompanyAndSaveToRepository(new Employee("Kiss Balázs", /*pozicio volt itt,*/1400, LocalDateTime.of(2010, 03, 13, 10, 25)), tipikMagyar, belsoEllenor);
+		setCompanyAndSaveToRepository(new Employee("Pista", /*pozicio volt itt,*/987, LocalDateTime.of(1987, 03, 13, 10, 25)), tipikMagyar, munkas);
+		setCompanyAndSaveToRepository(new Employee("Józsi", /*pozicio volt itt,*/887, LocalDateTime.of(1986, 03, 13, 10, 25)), tipikMagyar, munkas);
 		
 		PositionDetailsByCompany pd = new PositionDetailsByCompany();
 		pd.setCompany(tipikMagyar);

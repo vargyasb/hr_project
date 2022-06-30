@@ -18,12 +18,12 @@ public class HrTLController {
 
 	private List<Employee> employees = new ArrayList<>();
 	
-	{
-		employees.add(new Employee(1L, "Steve", 3000, LocalDateTime.of(2010, 10, 13, 10, 25)));
-		employees.add(new Employee(2L, "Peter", 2000, LocalDateTime.of(2015, 10, 13, 10, 25)));
-		employees.add(new Employee(3L, "Anna", 2800, LocalDateTime.of(2020, 05, 10, 10, 25)));
-		employees.add(new Employee(4L, "David", 3200, LocalDateTime.of(2021, 10, 13, 10, 25)));
-	}
+//	{
+//		employees.add(new Employee(1L, "Steve", 3000, LocalDateTime.of(2010, 10, 13, 10, 25)));
+//		employees.add(new Employee(2L, "Peter", 2000, LocalDateTime.of(2015, 10, 13, 10, 25)));
+//		employees.add(new Employee(3L, "Anna", 2800, LocalDateTime.of(2020, 05, 10, 10, 25)));
+//		employees.add(new Employee(4L, "David", 3200, LocalDateTime.of(2021, 10, 13, 10, 25)));
+//	}
 	
 	@GetMapping("/")
 	public String home() {

@@ -29,8 +29,7 @@ public class Employee {
 
 	}
 
-	public Employee(Long id, String name, int salary, LocalDateTime startOfEmployment) {
-		this.id = id;
+	public Employee(String name, int salary, LocalDateTime startOfEmployment) {
 		this.name = name;
 		this.salary = salary;
 		this.startOfEmployment = startOfEmployment;

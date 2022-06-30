@@ -101,6 +101,11 @@ public class EmployeeController {
 		return employeeMapper.employeesToDtos(employeeService.findByStartOfEmploymentBetween(from, to));
 	}
 	
+	@PostMapping(params = "example")
+	public List<EmployeeDto> getEmployeesByExample(@RequestBody EmployeeDto employeeDto) {
+		return employeeMapper.employeesToDtos(employeeService.findEmployeesByExample(employeeMapper.employeeDtoToEmployee(employeeDto)));
+	}
+	
 	private EmployeeDto findByIdOrThrowNotFound(long id) {
 		Employee employee = employeeService.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));

@@ -33,12 +33,10 @@ public class Company {
 	@OneToMany(mappedBy = "company")
 	private List<Employee> employees = new ArrayList<>();
 
-	public Company(Long id, String registrationNumber, String name, String address, CompanyType companyType) {
-		this.id = id;
+	public Company(String registrationNumber, String name, String address) {
 		this.registrationNumber = registrationNumber;
 		this.name = name;
 		this.address = address;
-		this.companyType = companyType;
 	}
 
 	public Company() {

@@ -9,9 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
+import hu.webuni.hr.vargyasb.model.Company;
 import hu.webuni.hr.vargyasb.model.Employee;
 import hu.webuni.hr.vargyasb.model.Position;
 import hu.webuni.hr.vargyasb.repository.EmployeeRepository;
@@ -90,6 +94,40 @@ public abstract class AbstractEmployee implements EmployeeService {
 
 	public List<Employee> findByStartOfEmploymentBetween(LocalDateTime from, LocalDateTime to) {
 		return employeeRepository.findByStartOfEmploymentBetween(from, to);
+	}
+	
+	public List<Employee> findEmployeesByExample(Employee example) {
+		Long id = example.getId();
+		if(id == null)
+			id = (long) 0;
+		String name = example.getName();
+		String positionName = null;
+		Position position = example.getPosition();
+		if(position != null)
+			positionName = position.getName();
+		int salary = example.getSalary();
+		LocalDateTime startOfEmployment = example.getStartOfEmployment();
+		String companyName = null;
+		Company company = example.getCompany();
+		if(company != null)
+			companyName = company.getName();
+		
+		Specification<Employee> spec = Specification.where(null);
+		
+		if(id > 0)
+			spec = spec.and(EmployeeSpecifications.hasId(id));
+		if(StringUtils.hasText(name))
+			spec = spec.and(EmployeeSpecifications.hasName(name));
+		if(StringUtils.hasText(positionName))
+			spec = spec.and(EmployeeSpecifications.hasPosition(positionName));
+		if(salary > 0)
+			spec = spec.and(EmployeeSpecifications.hasSalary(salary));
+		if(startOfEmployment != null)
+			spec = spec.and(EmployeeSpecifications.hasstartOfEmployment(startOfEmployment));
+		if(StringUtils.hasText(companyName))
+			spec = spec.and(EmployeeSpecifications.hasCompany(companyName));
+			
+		return employeeRepository.findAll(spec, Sort.by("id"));
 	}
 	
 }

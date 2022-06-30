@@ -30,4 +30,5 @@ public interface EmployeeService {
 	
 	List<Employee> findByStartOfEmploymentBetween(LocalDateTime from, LocalDateTime to);
 
+	List<Employee> findEmployeesByExample(Employee example);
 }
