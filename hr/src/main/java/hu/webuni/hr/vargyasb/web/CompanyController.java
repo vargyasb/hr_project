@@ -69,35 +69,29 @@ public class CompanyController {
 
 	@PutMapping("/{id}")
 	public CompanyDto modifyCompany(@PathVariable long id, @RequestBody CompanyDto companyDto) {
-		findByIdOrThrowNotFound(id);
-		
 		companyDto.setId(id);
-		Company company = companyService.save(companyMapper.companyDtoToCompany(companyDto));
+		Company company = companyService.update(companyMapper.companyDtoToCompany(companyDto));
 //		return companyMapper.companyToCompanyDto(company);
 		return companyMapper.companyToCompanyDtoWithNoEmployees(company);
 	}
 
 	@DeleteMapping("/{id}")
 	public void deleteCompany(@PathVariable long id) {
-		findByIdOrThrowNotFound(id); 
 		companyService.delete(id);
 	}
 
 	@PostMapping("/{id}/addEmployee")
 	public CompanyDto addNewEmployee(@PathVariable long id, @RequestBody EmployeeDto employeeDto) {
-		findByIdOrThrowNotFound(id);
 		return companyMapper.companyToCompanyDto(companyService.addEmployee(id, employeeMapper.employeeDtoToEmployee(employeeDto)));
 	}
 
 	@DeleteMapping("/{id}/deleteEmployee/{employeeId}")
 	public CompanyDto deleteEmployee(@PathVariable long id, @PathVariable long employeeId) {
-		findByIdOrThrowNotFound(id);
 		return companyMapper.companyToCompanyDto(companyService.deleteEmployee(id, employeeId));
 	}
 
 	@PutMapping("/{id}/addEmployee")
 	public CompanyDto changeEmployees(@PathVariable long id, @RequestBody List<EmployeeDto> employees) {
-		findByIdOrThrowNotFound(id);
 		return companyMapper.companyToCompanyDto(companyService.replaceEmployees(id, employeeMapper.employeeDtosToemployees(employees)));
 	}
 	
@@ -118,11 +112,11 @@ public class CompanyController {
 		return companyService.averageDescSalaryByPositionInACompany(id);
 	}
 
-	private CompanyDto findByIdOrThrowNotFound(long id) {
-		Company company = companyService.findByIdWithEmployees(id)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-		return companyMapper.companyToCompanyDto(company);
-	}
+//	private CompanyDto findByIdOrThrowNotFound(long id) {
+//		Company company = companyService.findByIdWithEmployees(id)
+//				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+//		return companyMapper.companyToCompanyDto(company);
+//	}
 
 	private boolean isFull(Boolean full) {
 		return full != null && full;

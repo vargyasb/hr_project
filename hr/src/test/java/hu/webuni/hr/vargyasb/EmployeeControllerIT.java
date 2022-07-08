@@ -1,7 +1,6 @@
 package hu.webuni.hr.vargyasb;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -17,7 +16,13 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import hu.webuni.hr.vargyasb.dto.CompanyDto;
 import hu.webuni.hr.vargyasb.dto.EmployeeDto;
+import hu.webuni.hr.vargyasb.model.Company;
+import hu.webuni.hr.vargyasb.model.Employee;
+import hu.webuni.hr.vargyasb.model.Position;
+import hu.webuni.hr.vargyasb.repository.CompanyRepository;
 import hu.webuni.hr.vargyasb.repository.EmployeeRepository;
+import hu.webuni.hr.vargyasb.repository.PositionDetailsByCompanyRepository;
+import hu.webuni.hr.vargyasb.repository.PositionRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase
@@ -31,9 +36,21 @@ public class EmployeeControllerIT {
 	@Autowired
 	EmployeeRepository employeeRepository;
 	
+	@Autowired
+	CompanyRepository companyRepository;
+	
+	@Autowired
+	PositionRepository positionRepository;
+	
+	@Autowired
+	PositionDetailsByCompanyRepository positionDetailsByCompanyRepository;
+	
 	@BeforeEach
 	public void init() {
 		employeeRepository.deleteAll();
+		positionDetailsByCompanyRepository.deleteAll();
+		positionRepository.deleteAll();
+		companyRepository.deleteAll();
 	}
 	
 	@Test
@@ -106,97 +123,124 @@ public class EmployeeControllerIT {
 	
 	@Test
 	void testThatEmployeeIsFoundByExampleId() throws Exception {
-		EmployeeDto employee = new EmployeeDto("Teszt Elek", 9999, "Developer", LocalDateTime.of(2010, 10, 13, 10, 25));
-		employee = createEmployee(employee);
-		long employeeId = employee.getId();
+		long employeeId = createTestDataAndReturnEmployeeId();
 
-		EmployeeDto example = new EmployeeDto();
+		Employee example = new Employee();
 		example.setId(employeeId);
 
 		List<EmployeeDto> results = findEmployeeByExample(example);
 		
-		assertThat(results.isEmpty()).isFalse();
+		assertThat(results.size()).isEqualTo(1);
+		assertThat(results.get(0).getId() == employeeId).isTrue();
 	}
 	
 	@Test
 	void testThatEmployeeIsFoundByExampleName() throws Exception {
-		EmployeeDto employee = new EmployeeDto("Teszt Elek", 9999, "Developer", LocalDateTime.of(2010, 10, 13, 10, 25));
-		employee = createEmployee(employee);
-		
-		EmployeeDto example = new EmployeeDto();
-		example.setName("Teszt");
+		long employeeId = createTestDataAndReturnEmployeeId();
+
+		Employee example = new Employee();
+		example.setName("Teszt ");
 		
 		List<EmployeeDto> results = findEmployeeByExample(example);
 		
-		assertThat(results.isEmpty()).isFalse();
+		assertThat(results.size()).isEqualTo(1);
+		assertThat(results.get(0).getId() == employeeId).isTrue();
 	}
 	
 	@Test
 	void testThatEmployeeIsFoundByExamplePosition() throws Exception {
-		EmployeeDto employee = new EmployeeDto("Teszt Elek", 9999, "Developer", LocalDateTime.of(2010, 10, 13, 10, 25));
-		employee = createEmployee(employee);
-		
+		long employeeId = createTestDataAndReturnEmployeeId();
+
 		EmployeeDto example = new EmployeeDto();
 		example.setPosition("Developer");
 		
-		List<EmployeeDto> results = findEmployeeByExample(example);
+		List<EmployeeDto> results = findEmployeeByExampleDto(example);
 		
-		assertThat(results.isEmpty()).isFalse();
+		assertThat(results.size()).isEqualTo(1);
+		assertThat(results.get(0).getId() == employeeId).isTrue();
 	}
 	
 	@Test
 	void testThatEmployeeIsFoundByExampleSalary() throws Exception {
-		EmployeeDto employee = new EmployeeDto("Teszt Elek", 9999, "Developer", LocalDateTime.of(2010, 10, 13, 10, 25));
-		employee = createEmployee(employee);
-		
-		EmployeeDto example = new EmployeeDto();
+		long employeeId = createTestDataAndReturnEmployeeId();
+
+		Employee example = new Employee();
 		example.setSalary(10200);
 		
 		List<EmployeeDto> results = findEmployeeByExample(example);
 		
-		assertThat(results.isEmpty()).isFalse();
+		assertThat(results.size()).isEqualTo(1);
+		assertThat(results.get(0).getId() == employeeId).isTrue();
 	}
 	
 	@Test
 	void testThatEmployeeIsFoundByExampleSalaryWithNoResults() throws Exception {
-		EmployeeDto employee = new EmployeeDto("Teszt Elek", 9999, "Developer", LocalDateTime.of(2010, 10, 13, 10, 25));
-		employee = createEmployee(employee);
-		
-		EmployeeDto example = new EmployeeDto();
+		createTestDataAndReturnEmployeeId();
+
+		Employee example = new Employee();
 		example.setSalary(6000);
 		
 		List<EmployeeDto> results = findEmployeeByExample(example);
 		
-		assertThat(results.isEmpty()).isTrue();
+		assertThat(results).isEmpty();
 	}
 	
 	@Test
 	void testThatEmployeeIsFoundByExampleStartOfEmployment() throws Exception {
-		EmployeeDto employee = new EmployeeDto("Teszt Elek", 9999, "Developer", LocalDateTime.of(2010, 10, 13, 10, 25));
-		employee = createEmployee(employee);
-		
-		EmployeeDto example = new EmployeeDto();
+		long employeeId = createTestDataAndReturnEmployeeId();
+
+		Employee example = new Employee();
 		example.setStartOfEmployment(LocalDateTime.of(2010, 10, 13, 0, 0));
 		
 		List<EmployeeDto> results = findEmployeeByExample(example);
 		
-		assertThat(results.isEmpty()).isFalse();
+		assertThat(results.size()).isEqualTo(1);
+		assertThat(results.get(0).getId() == employeeId).isTrue();
 	}
 	
 	@Test
 	void testThatEmployeeIsFoundByExampleCompany() throws Exception {
-		EmployeeDto employee = new EmployeeDto("Teszt Elek", 9999, "Developer", LocalDateTime.of(2010, 10, 13, 10, 25));
-		CompanyDto company = new CompanyDto(null, "Udemy Corporated", null, null, null);
-		company = createCompany(company);
-		employee.setCompany(company);
-		employee = createEmployee(employee);
-		
-		EmployeeDto example = new EmployeeDto();
-		example.setCompany(new CompanyDto(null, "Udemy", null, null, null));
+		long employeeId = createTestDataAndReturnEmployeeId();
+
+		Employee example = new Employee();
+		example.setCompany(new Company(null, "Udemy", null));
 		
 		List<EmployeeDto> results = findEmployeeByExample(example);
 		
-		assertThat(results.isEmpty()).isFalse();
+		assertThat(results.size()).isEqualTo(1);
+		assertThat(results.get(0).getId() == employeeId).isTrue();
+	}
+	
+	private long createTestDataAndReturnEmployeeId() {
+		Employee employee = new Employee("Teszt Elek", 9999, LocalDateTime.of(2010, 10, 13, 10, 25));
+		Company company = new Company("1234", "Udemy", "Something str 99");
+		Position position = new Position("Developer", "BSC", 10000);
+		position = positionRepository.save(position);
+		company = companyRepository.save(company);
+		employee.setCompany(company);
+		employee.setPosition(position);
+		employee = employeeRepository.save(employee);
+		long employeeId = employee.getId();
+		
+		employee = new Employee("Teszt2 Elek", 1234, LocalDateTime.of(2015, 10, 13, 10, 25));
+		company = new Company("4444", "Webuni", "Something str 12");
+		position = new Position("Tester", "BSC", 1000);
+		position = positionRepository.save(position);
+		company = companyRepository.save(company);
+		employee.setCompany(company);
+		employee.setPosition(position);
+		employee = employeeRepository.save(employee);
+		
+		employee = new Employee("3Teszt Elek", 4312, LocalDateTime.of(2020, 10, 13, 10, 25));
+		company = new Company("1111", "Coursera", "Something str 1");
+		position = new Position("Scrum Master", "BSC", 5230);
+		position = positionRepository.save(position);
+		company = companyRepository.save(company);
+		employee.setCompany(company);
+		employee.setPosition(position);
+		employee = employeeRepository.save(employee);
+		
+		return employeeId;
 	}
 	
 	private CompanyDto createCompany(CompanyDto company) {
@@ -212,7 +256,20 @@ public class EmployeeControllerIT {
 				.getResponseBody();
 	}
 
-	private List<EmployeeDto> findEmployeeByExample(EmployeeDto example) {
+	private List<EmployeeDto> findEmployeeByExample(Employee example) {
+		return webTestClient
+		.post()
+		.uri(BASE_URI + "?example")
+		.bodyValue(example)
+		.exchange()
+		.expectStatus()
+		.isOk()
+		.expectBodyList(EmployeeDto.class)
+		.returnResult()
+		.getResponseBody();
+	}
+	
+	private List<EmployeeDto> findEmployeeByExampleDto(EmployeeDto example) {
 		return webTestClient
 		.post()
 		.uri(BASE_URI + "?example")

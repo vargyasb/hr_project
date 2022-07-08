@@ -55,10 +55,8 @@ public class EmployeeController {
 
 	@PutMapping("/{id}")
 	public EmployeeDto modifyEmployee(@PathVariable long id, @RequestBody @Valid EmployeeDto employeeDto) {
-		findByIdOrThrowNotFound(id);
-		
 		employeeDto.setId(id);
-		Employee employee = employeeService.save(employeeMapper.employeeDtoToEmployee(employeeDto));
+		Employee employee = employeeService.update(employeeMapper.employeeDtoToEmployee(employeeDto));
 		return employeeMapper.employeeToDto(employee);
 //		try {
 //			Employee employee = employeeService.update(employeeMapper.employeeDtoToEmployee(employeeDto));
@@ -70,7 +68,6 @@ public class EmployeeController {
 
 	@DeleteMapping("/{id}")
 	public void deleteEmpolyee(@PathVariable long id) {
-		findByIdOrThrowNotFound(id);
 		employeeService.delete(id);
 	}
 

@@ -25,6 +25,10 @@ public class CompanyDto {
 	public CompanyDto() {
 
 	}
+	
+	public CompanyDto(String name) {
+		this.name = name;
+	}
 
 	public Long getId() {
 		return id;
