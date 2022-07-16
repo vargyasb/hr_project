@@ -1,11 +1,15 @@
 package hu.webuni.hr.vargyasb.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 @Entity
 public class Employee {
@@ -24,6 +28,12 @@ public class Employee {
 	
 	@ManyToOne
 	private Company company;
+	
+	@OneToMany(mappedBy = "requester")
+	private List<HolidayRequest> holidayRequests = new ArrayList<>();
+	
+	@OneToOne
+	private Employee manager;
 
 	public Employee() {
 
@@ -83,6 +93,30 @@ public class Employee {
 		this.company = company;
 	}
 	
+	public List<HolidayRequest> getHolidayRequests() {
+		return holidayRequests;
+	}
+
+	public void setHolidayRequests(List<HolidayRequest> holidayRequests) {
+		this.holidayRequests = holidayRequests;
+	}
+	
+	public void addHolidayRequest(HolidayRequest holidayRequest) {
+		if (this.holidayRequests == null)
+			this.holidayRequests = new ArrayList<>();
+			
+		holidayRequests.add(holidayRequest);
+		holidayRequest.setRequester(this);
+	}
+
+	public Employee getManager() {
+		return manager;
+	}
+
+	public void setManager(Employee manager) {
+		this.manager = manager;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
