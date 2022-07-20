@@ -3,8 +3,11 @@ package hu.webuni.hr.vargyasb.model;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -12,7 +15,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 @Entity
-public class Employee {
+public class Employee{
 
 	@Id
 	@GeneratedValue
@@ -34,6 +37,12 @@ public class Employee {
 	
 	@OneToOne
 	private Employee manager;
+	
+	private String username;
+	private String password;
+	
+	@ElementCollection(fetch = FetchType.EAGER)
+	private Set<String> roles;
 
 	public Employee() {
 
@@ -115,6 +124,30 @@ public class Employee {
 
 	public void setManager(Employee manager) {
 		this.manager = manager;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public Set<String> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(Set<String> roles) {
+		this.roles = roles;
 	}
 
 	@Override

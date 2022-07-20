@@ -2,9 +2,15 @@ package hu.webuni.hr.vargyasb.web;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PostFilter;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,13 +49,18 @@ public class HolidayRequestController {
 	}
 
 	@PostMapping
-	public HolidayRequestDto createNewHolidayRequest(@RequestBody HolidayRequestDto holidayRequestDto) {
+	@PreAuthorize("#holidayRequestDto.requesterId == authentication.principal.employee.id")
+	public HolidayRequestDto createNewHolidayRequest(@RequestBody @Valid HolidayRequestDto holidayRequestDto) {
 		HolidayRequest holidayRequest = holidayRequestService.addHolidayRequest(holidayRequestMapper.holidayRequestDtoToHolidayRequest(holidayRequestDto), holidayRequestDto.getRequesterId());
+//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//		String currentPrincipalName = authentication.getName();
+//		System.out.println(currentPrincipalName);
 		return holidayRequestMapper.holidayRequestToDto(holidayRequest);
 	}
 	
 	@PutMapping("/{id}")
-	public HolidayRequestDto modifyHolidayRequest(@PathVariable long id, @RequestBody HolidayRequestDto holidayRequestDto) {
+	@PreAuthorize("#holidayRequestDto.requesterId == authentication.principal.employee.id")
+	public HolidayRequestDto modifyHolidayRequest(@PathVariable long id, @RequestBody @Valid HolidayRequestDto holidayRequestDto) {
 		holidayRequestDto.setId(id);
 		HolidayRequest holidayRequest = holidayRequestService.update(holidayRequestMapper.holidayRequestDtoToHolidayRequest(holidayRequestDto));
 		return holidayRequestMapper.holidayRequestToDto(holidayRequest);
@@ -60,9 +71,9 @@ public class HolidayRequestController {
 		holidayRequestService.deleteHolidayRequest(id);
 	}
 	
-	@PutMapping(value = "/{id}/approve", params = {"status", "approverId" })
-	public HolidayRequestDto approveHolidayRequest(@PathVariable long id, @RequestParam HolidayRequestStatus status, @RequestParam long approverId) {
-		return holidayRequestMapper.holidayRequestToDto(holidayRequestService.approveHolidayRequest(id, approverId, status));
+	@PutMapping(value = "/{id}/approve", params = {"status"})
+	public HolidayRequestDto approveHolidayRequest(@PathVariable long id, @RequestParam HolidayRequestStatus status) {
+		return holidayRequestMapper.holidayRequestToDto(holidayRequestService.approveHolidayRequest(id, status));
 	}
 	
 	@PostMapping("/find")

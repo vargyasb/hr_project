@@ -2,6 +2,7 @@ package hu.webuni.hr.vargyasb.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
@@ -44,5 +45,5 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
 			+ ")")
 	int updateSalaries(String position, int minSalary, long companyId);
 
-	
+	Optional<Employee> findByUsername(String username);
 }

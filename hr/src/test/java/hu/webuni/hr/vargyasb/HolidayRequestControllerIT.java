@@ -14,59 +14,62 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import hu.webuni.hr.vargyasb.dto.HolidayRequestDto;
 import hu.webuni.hr.vargyasb.dto.HolidayRequestFilterDto;
-import hu.webuni.hr.vargyasb.model.Company;
 import hu.webuni.hr.vargyasb.model.Employee;
 import hu.webuni.hr.vargyasb.model.HolidayRequestStatus;
-import hu.webuni.hr.vargyasb.model.Position;
-import hu.webuni.hr.vargyasb.repository.CompanyRepository;
 import hu.webuni.hr.vargyasb.repository.EmployeeRepository;
 import hu.webuni.hr.vargyasb.repository.HolidayRequestRepository;
-import hu.webuni.hr.vargyasb.repository.PositionDetailsByCompanyRepository;
-import hu.webuni.hr.vargyasb.repository.PositionRepository;
 import hu.webuni.hr.vargyasb.service.EmployeeService;
-import hu.webuni.hr.vargyasb.service.InitDbService;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase
 public class HolidayRequestControllerIT {
 
+	private static final String PASSWORD = "pass";
+
+	private static final String TESTUSER_NAME = "testuser";
+	
+	private static final String TESTUSER2_NAME = "apapapapa";
+
 	private static final String BASE_URI = "api/holidayrequests";
 
 	@Autowired
 	WebTestClient webTestClient;
-
-	@Autowired
-	InitDbService initDbService;
 	
 	@Autowired
 	EmployeeService employeeService;
 
 	@Autowired
 	EmployeeRepository employeeRepository;
-	
-	@Autowired
-	PositionDetailsByCompanyRepository positionDetailsByCompanyRepository;
-
-	@Autowired
-	PositionRepository positionRepository;
-
-	@Autowired
-	CompanyRepository companyRepository;
 
 	@Autowired
 	HolidayRequestRepository holidayRequestRepository;
+	
+	@Autowired
+	PasswordEncoder passwordEncoder;
 	
 	@BeforeEach
 	public void init() {
 		holidayRequestRepository.deleteAll();
 		employeeRepository.deleteAll();
-		positionDetailsByCompanyRepository.deleteAll();
-		positionRepository.deleteAll();
-		companyRepository.deleteAll();
+		
+		Employee testUser1 = new Employee();
+		testUser1.setName(TESTUSER_NAME);
+		testUser1.setUsername(TESTUSER_NAME);
+		testUser1.setPassword(passwordEncoder.encode(PASSWORD));
+		
+		Employee testUser2 = new Employee();
+		testUser2.setName(TESTUSER2_NAME);
+		testUser2.setUsername(TESTUSER2_NAME);
+		testUser2.setPassword(passwordEncoder.encode(PASSWORD));
+		employeeRepository.save(testUser2);
+		
+		testUser1.setManager(testUser2);
+		employeeRepository.save(testUser1);
 	}
 
 	@Test
@@ -74,9 +77,10 @@ public class HolidayRequestControllerIT {
 
 		List<HolidayRequestDto> requestsBefore = getHolidayRequests();
 
-		HolidayRequestDto holidayRequest = createTestData();
+		HolidayRequestDto holidayRequest = createHolidayRequestDtoObject(TESTUSER_NAME, 
+				LocalDate.of(2022, 11, 12), LocalDate.of(2022, 11, 13));
 
-		createHolidayRequest(holidayRequest);
+		holidayRequest = createHolidayRequest(holidayRequest, TESTUSER_NAME, PASSWORD);
 
 		List<HolidayRequestDto> requestsAfter = getHolidayRequests();
 
@@ -96,13 +100,13 @@ public class HolidayRequestControllerIT {
 
 	@Test
 	void testThatHolidayRequestIsModified() throws Exception {
-		HolidayRequestDto holidayRequest = createTestData();
+		HolidayRequestDto holidayRequest = createHolidayRequestDtoObject(TESTUSER_NAME, 
+				LocalDate.of(2022, 11, 12), LocalDate.of(2022, 11, 13));
 
-		holidayRequest = createHolidayRequest(holidayRequest);
+		holidayRequest = createHolidayRequest(holidayRequest, TESTUSER_NAME, PASSWORD);
 		long holidayRequestId = holidayRequest.getId();
 		
 		long requesterId = holidayRequest.getRequesterId();
-		long approverId = holidayRequest.getApproverId();
 		LocalDate startDate = holidayRequest.getStartDate();
 		LocalDate endDate = holidayRequest.getEndDate();
 		
@@ -110,9 +114,8 @@ public class HolidayRequestControllerIT {
 		newHolidayRequest.setStartDate(startDate.plusDays(1));
 		newHolidayRequest.setEndDate(endDate.plusDays(1));
 		newHolidayRequest.setRequesterId(requesterId);
-		newHolidayRequest.setApproverId(approverId);
 		newHolidayRequest.setStatus(HolidayRequestStatus.NEW);
-		HolidayRequestDto modifiedHolidayRequest = modifyHolidayRequest(holidayRequestId, newHolidayRequest);
+		HolidayRequestDto modifiedHolidayRequest = modifyHolidayRequest(holidayRequestId, newHolidayRequest, TESTUSER_NAME, PASSWORD);
 		
 		assertThat(modifiedHolidayRequest)
 		.usingRecursiveComparison()
@@ -122,74 +125,101 @@ public class HolidayRequestControllerIT {
 
 	@Test
 	void testThatHolidayRequestIsApproved() throws Exception {
-		HolidayRequestDto holidayRequest = createTestData();
+		HolidayRequestDto holidayRequest = createHolidayRequestDtoObject(TESTUSER_NAME, 
+				LocalDate.of(2022, 11, 12), LocalDate.of(2022, 11, 13));
 		
-		holidayRequest = createHolidayRequest(holidayRequest);
+		holidayRequest = createHolidayRequest(holidayRequest, TESTUSER_NAME, PASSWORD);
 		long holidayRequestId = holidayRequest.getId();
-		long approverId = holidayRequest.getApproverId();
 		
 		assertThat(holidayRequest.getStatus()).isEqualTo(HolidayRequestStatus.NEW);
+		assertThat(holidayRequest.getApproverId()).isNull();
 		
-		holidayRequest = approveHolidayRequest(holidayRequestId, HolidayRequestStatus.ACCEPTED, approverId);
+		holidayRequest = approveHolidayRequest(holidayRequestId, HolidayRequestStatus.ACCEPTED, TESTUSER2_NAME, PASSWORD);
 		
 		assertThat(holidayRequest.getStatus()).isEqualTo(HolidayRequestStatus.ACCEPTED);
 	}
 
 	@Test
 	void testThatHolidayRequestIsDeleted() throws Exception {
+		HolidayRequestDto holidayRequest = createHolidayRequestDtoObject(TESTUSER_NAME, 
+				LocalDate.of(2022, 11, 12), LocalDate.of(2022, 11, 13));
 		
+		holidayRequest = createHolidayRequest(holidayRequest, TESTUSER_NAME, PASSWORD);
+		long holidayRequestId = holidayRequest.getId();
+		
+		List<HolidayRequestDto> requestsBefore = getHolidayRequests();
+		
+		assertThat(requestsBefore).hasSize(1);
+		
+		deleteHolidayRequest(holidayRequestId, TESTUSER_NAME, PASSWORD);
+		
+		List<HolidayRequestDto> requestsAfter = getHolidayRequests();
+		assertThat(requestsAfter).isEmpty();
 	}
 
 	@Test
 	void testThatHolidayRequestIsFoundByExampleStatus() throws Exception {
-		HolidayRequestDto holidayRequestWithNewStatus = createTestData();
-		holidayRequestWithNewStatus = createHolidayRequest(holidayRequestWithNewStatus);
-		long holidayRequestIdNew = holidayRequestWithNewStatus.getId();
+		HolidayRequestDto holidayRequestWithNewStatus = createHolidayRequestDtoObject(TESTUSER_NAME, 
+				LocalDate.of(2022, 11, 12), LocalDate.of(2022, 11, 13));
+		holidayRequestWithNewStatus = createHolidayRequest(holidayRequestWithNewStatus, TESTUSER_NAME, PASSWORD);
+		long holidayRequestWithNewStatusId = holidayRequestWithNewStatus.getId();
 		
-		HolidayRequestDto holidayRequestAccepted = createTestData();
-		holidayRequestAccepted = createHolidayRequest(holidayRequestAccepted);
+		HolidayRequestDto holidayRequestAccepted = createHolidayRequestDtoObject(TESTUSER_NAME, 
+				LocalDate.of(2022, 11, 12), LocalDate.of(2022, 11, 13));
+		holidayRequestAccepted = createHolidayRequest(holidayRequestAccepted, TESTUSER_NAME, PASSWORD);
 		long holidayRequestId = holidayRequestAccepted.getId();
-		long approverId = holidayRequestAccepted.getApproverId();
-		holidayRequestAccepted = approveHolidayRequest(holidayRequestId, HolidayRequestStatus.ACCEPTED, approverId);
+		holidayRequestAccepted = approveHolidayRequest(holidayRequestId, HolidayRequestStatus.ACCEPTED, TESTUSER2_NAME, PASSWORD);
 		
 		List<HolidayRequestDto> resultAll = getHolidayRequests();
 		
-		assertThat(resultAll.size()).isEqualTo(2);
+		assertThat(resultAll).hasSize(2);
 		
 		HolidayRequestFilterDto example = new HolidayRequestFilterDto();
 		example.setStatus(HolidayRequestStatus.NEW);
 		
 		List<HolidayRequestDto> resultsFiltered = findHolidayRequestsByExample(example, null);
 		
-		assertThat(resultsFiltered.size()).isEqualTo(1);
-		assertThat(resultsFiltered.get(0).getId()).isEqualTo(holidayRequestIdNew);
+		assertThat(resultsFiltered).hasSize(1);
+		assertThat(resultsFiltered.get(0).getId()).isEqualTo(holidayRequestWithNewStatusId);
 	}
 
 	@Test
 	void testThatHolidayRequestIsFoundByExampleRequesterName() throws Exception {
-		HolidayRequestDto holidayRequest = createTestData();
-		holidayRequest = createHolidayRequest(holidayRequest);
-		long requesterId = holidayRequest.getRequesterId();
-		Employee requester = employeeRepository.findById(requesterId).get();
-		String requesterName = requester.getName();
+		HolidayRequestDto holidayRequest1 = createHolidayRequestDtoObject(TESTUSER_NAME, 
+				LocalDate.of(2022, 11, 12), LocalDate.of(2022, 11, 13));
+		holidayRequest1 = createHolidayRequest(holidayRequest1, TESTUSER_NAME, PASSWORD);
 		
+		long holidayRequesterId = holidayRequest1.getRequesterId();
+		Employee requester = employeeRepository.findById(holidayRequesterId).get();
+
+		HolidayRequestDto holidayRequest2 = createHolidayRequestDtoObject(TESTUSER2_NAME, 
+				LocalDate.of(2022, 11, 12), LocalDate.of(2022, 11, 13));
+		holidayRequest2 = createHolidayRequest(holidayRequest2, TESTUSER2_NAME, PASSWORD);
+		
+		String requesterNameToBeFound = TESTUSER_NAME;
 		HolidayRequestFilterDto example = new HolidayRequestFilterDto();
-		example.setRequesterName(requesterName);
+		example.setRequesterName(requesterNameToBeFound);
 		
 		List<HolidayRequestDto> results = findHolidayRequestsByExample(example, null);
 		
-		assertThat(results.size()).isEqualTo(1);
+		assertThat(results).hasSize(1);
 		assertThat(results.get(0).getRequesterId()).isEqualTo(requester.getId());
 	}
 
 	@Test
 	void testThatHolidayRequestIsFoundByExampleApproverName() throws Exception {
-		HolidayRequestDto holidayRequest = createTestData();
-		holidayRequest = createHolidayRequest(holidayRequest);
-		long approverId = holidayRequest.getApproverId();
-		Employee approver = employeeRepository.findById(approverId).get();
+		HolidayRequestDto holidayRequest1 = createHolidayRequestDtoObject(TESTUSER_NAME, 
+				LocalDate.of(2022, 11, 12), LocalDate.of(2022, 11, 13));
+		holidayRequest1 = createHolidayRequest(holidayRequest1, TESTUSER_NAME, PASSWORD);
+		long holidayRequest1Id = holidayRequest1.getId();
+		holidayRequest1 = approveHolidayRequest(holidayRequest1Id, HolidayRequestStatus.ACCEPTED, TESTUSER2_NAME, PASSWORD);
+
+		HolidayRequestDto holidayRequest2 = createHolidayRequestDtoObject(TESTUSER2_NAME, 
+				LocalDate.of(2022, 11, 12), LocalDate.of(2022, 11, 13));
+		holidayRequest2 = createHolidayRequest(holidayRequest2, TESTUSER2_NAME, PASSWORD);
+				
+		Employee approver = employeeRepository.findByUsername(TESTUSER2_NAME).get();
 		String approverName = approver.getName();
-		
 		HolidayRequestFilterDto example = new HolidayRequestFilterDto();
 		example.setApproverName(approverName);
 		
@@ -201,8 +231,10 @@ public class HolidayRequestControllerIT {
 
 	@Test
 	void testThatHolidayRequestIsFoundByExampleRequestDate() throws Exception {
-		HolidayRequestDto holidayRequest = createTestData();
-		holidayRequest = createHolidayRequest(holidayRequest);
+		HolidayRequestDto holidayRequest = createHolidayRequestDtoObject(TESTUSER_NAME, 
+				LocalDate.of(2022, 11, 12), LocalDate.of(2022, 11, 13));
+		holidayRequest = createHolidayRequest(holidayRequest, TESTUSER_NAME, PASSWORD);
+
 		LocalDateTime requestDate = holidayRequest.getRequestDate();
 		
 		HolidayRequestFilterDto example = new HolidayRequestFilterDto();
@@ -217,10 +249,16 @@ public class HolidayRequestControllerIT {
 
 	@Test
 	void testThatHolidayRequestIsFoundByExampleStartAndEndDates() throws Exception {
-		HolidayRequestDto holidayRequest = createTestData();
-		holidayRequest = createHolidayRequest(holidayRequest);
-		LocalDate requestStartDate = holidayRequest.getStartDate();
-		LocalDate requestEndDate = holidayRequest.getEndDate();
+		HolidayRequestDto holidayRequest1 = createHolidayRequestDtoObject(TESTUSER_NAME, 
+				LocalDate.of(2022, 11, 12), LocalDate.of(2022, 11, 13));
+		holidayRequest1 = createHolidayRequest(holidayRequest1, TESTUSER_NAME, PASSWORD);
+		
+		HolidayRequestDto holidayRequest2 = createHolidayRequestDtoObject(TESTUSER2_NAME, 
+				LocalDate.of(2022, 10, 12), LocalDate.of(2022, 10, 13));
+		holidayRequest2 = createHolidayRequest(holidayRequest2, TESTUSER2_NAME, PASSWORD);
+		
+		LocalDate requestStartDate = holidayRequest1.getStartDate();
+		LocalDate requestEndDate = holidayRequest1.getEndDate();
 		
 		HolidayRequestFilterDto example = new HolidayRequestFilterDto();
 		example.setStartDate(requestStartDate.minusDays(1));
@@ -237,6 +275,7 @@ public class HolidayRequestControllerIT {
 		List<HolidayRequestDto> holidayRequests = webTestClient
 				.get()
 				.uri(BASE_URI)
+				.headers(headers -> headers.setBasicAuth(TESTUSER_NAME, PASSWORD))
 				.exchange()
 				.expectStatus()
 				.isOk()
@@ -248,10 +287,11 @@ public class HolidayRequestControllerIT {
 		return holidayRequests;
 	}
 
-	private HolidayRequestDto createHolidayRequest(HolidayRequestDto holidayRequest) {
+	private HolidayRequestDto createHolidayRequest(HolidayRequestDto holidayRequest, String username, String password) {
 		return webTestClient
 				.post()
 				.uri(BASE_URI)
+				.headers(headers -> headers.setBasicAuth(username, password))
 				.bodyValue(holidayRequest)
 				.exchange()
 				.expectStatus()
@@ -261,10 +301,21 @@ public class HolidayRequestControllerIT {
 				.getResponseBody();
 	}
 	
-	private HolidayRequestDto modifyHolidayRequest(Long requestId, HolidayRequestDto holidayRequest) {
+	private void deleteHolidayRequest(Long requestId, String username, String password) {
+			webTestClient
+				.delete()
+				.uri(BASE_URI + "/" + requestId)
+				.headers(headers -> headers.setBasicAuth(username, password))
+				.exchange()
+				.expectStatus()
+				.isOk();
+	}
+	
+	private HolidayRequestDto modifyHolidayRequest(Long requestId, HolidayRequestDto holidayRequest, String username, String password) {
 		return webTestClient
 				.put()
 				.uri(BASE_URI + "/" + requestId)
+				.headers(headers -> headers.setBasicAuth(username, password))
 				.bodyValue(holidayRequest)
 				.exchange()
 				.expectStatus()
@@ -274,14 +325,14 @@ public class HolidayRequestControllerIT {
 				.getResponseBody();
 	}
 	
-	private HolidayRequestDto approveHolidayRequest(long id, HolidayRequestStatus status, long approverId) {
+	private HolidayRequestDto approveHolidayRequest(long id, HolidayRequestStatus status, String username, String password) {
 		return webTestClient
 				.put()
 				.uri(uriBuilder -> uriBuilder
 						.path(BASE_URI + "/" + id + "/approve")
 						.queryParam("status", status)
-						.queryParam("approverId", approverId)
 						.build())
+				.headers(headers -> headers.setBasicAuth(username, password))
 				.exchange()
 				.expectStatus()
 				.isOk()
@@ -295,6 +346,7 @@ public class HolidayRequestControllerIT {
 		return webTestClient
 				.post()
 				.uri(BASE_URI + "/find")
+				.headers(headers -> headers.setBasicAuth(TESTUSER_NAME, PASSWORD))
 				.bodyValue(filter)
 				.exchange()
 				.expectStatus()
@@ -304,33 +356,11 @@ public class HolidayRequestControllerIT {
 				.getResponseBody();
 	}
 	
-	private HolidayRequestDto createTestData() {
-		Employee employee1 = new Employee("Teszt Elek", 9999, LocalDateTime.of(2010, 10, 13, 10, 25));
-		Company company = new Company("1234", "Udemy", "Something str 99");
-		Position position = new Position("Developer", "BSC", 10000);
-		position = positionRepository.save(position);
-		company = companyRepository.save(company);
-		employee1.setCompany(company);
-		employee1.setPosition(position);
-		employee1 = employeeRepository.save(employee1);
-		long employee1Id = employee1.getId();
-
-		Employee employee2 = new Employee("Teszt2 Elek", 1234, LocalDateTime.of(2015, 10, 13, 10, 25));
-		company = new Company("4444", "Webuni", "Something str 12");
-		position = new Position("Tester", "BSC", 1000);
-		position = positionRepository.save(position);
-		company = companyRepository.save(company);
-		employee2.setCompany(company);
-		employee2.setPosition(position);
-		employee2 = employeeRepository.save(employee2);
-		long employee2Id = employee2.getId();
-
+	private HolidayRequestDto createHolidayRequestDtoObject(String employeeName, LocalDate start, LocalDate end) {
 		HolidayRequestDto holidayRequest = new HolidayRequestDto();
-		holidayRequest.setStartDate(LocalDate.of(2022, 11, 12));
-		holidayRequest.setEndDate(LocalDate.of(2022, 11, 13));
-		holidayRequest.setRequesterId(employee1Id);
-		holidayRequest.setApproverId(employee2Id);
-
+		holidayRequest.setStartDate(start);
+		holidayRequest.setEndDate(end);
+		holidayRequest.setRequesterId(employeeRepository.findByUsername(employeeName).get().getId());
 		return holidayRequest;
 	}
 }

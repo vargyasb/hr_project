@@ -9,14 +9,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import hu.webuni.hr.vargyasb.dto.HolidayRequestFilterDto;
 import hu.webuni.hr.vargyasb.model.Employee;
 import hu.webuni.hr.vargyasb.model.HolidayRequest;
 import hu.webuni.hr.vargyasb.model.HolidayRequestStatus;
+import hu.webuni.hr.vargyasb.model.HrUser;
 import hu.webuni.hr.vargyasb.repository.HolidayRequestRepository;
 
 @Service
@@ -47,13 +50,23 @@ public class HolidayRequestService {
 		requester.addHolidayRequest(holidayRequest);
 		holidayRequest.setRequestDate(LocalDateTime.now());
 		holidayRequest.setStatus(HolidayRequestStatus.NEW);
+		holidayRequest.setApprover(null);
 		return holidayRequestRepository.save(holidayRequest);
 	}
 	
 	@Transactional
-	public HolidayRequest approveHolidayRequest(long id, long approverId, HolidayRequestStatus status) {
+	public HolidayRequest approveHolidayRequest(long id, HolidayRequestStatus status) {
 		HolidayRequest holidayRequest = holidayRequestRepository.findById(id).get();
-		holidayRequest.setApprover(employeeService.findById(approverId).get());
+		Employee manager = holidayRequest.getRequester().getManager();
+		HrUser authenticatedUser = (HrUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Long authenticatedUserId = authenticatedUser.getEmployee().getId();
+		if (manager != null) {
+			if (!manager.getId().equals(authenticatedUserId))
+				throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+		} else if (!holidayRequest.getRequester().getId().equals(authenticatedUserId))
+				throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+		
+		holidayRequest.setApprover(employeeService.findById(authenticatedUserId).get());
 		holidayRequest.setStatus(status);
 		return holidayRequest;
 	}
@@ -66,11 +79,9 @@ public class HolidayRequestService {
 			if (foundHolidayRequest.getStatus() == HolidayRequestStatus.NEW) {
 				foundHolidayRequest.setStartDate(holidayRequest.getStartDate());
 				foundHolidayRequest.setEndDate(holidayRequest.getEndDate());
-				foundHolidayRequest.setRequestDate(LocalDateTime.now());
-				foundHolidayRequest.setStatus(holidayRequest.getStatus());
 				return foundHolidayRequest;
-			}
-			throw new ResponseStatusException(HttpStatus.NOT_MODIFIED);
+			} else
+				throw new ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED);
 		}
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 	}
@@ -78,12 +89,19 @@ public class HolidayRequestService {
 	@Transactional
 	public void deleteHolidayRequest(long id) {
 		HolidayRequest holidayRequest = holidayRequestRepository.findById(id).get();
-		if (holidayRequest.getStatus() == HolidayRequestStatus.NEW) {
-			holidayRequest.getRequester().getHolidayRequests().remove(holidayRequest);
-			holidayRequestRepository.deleteById(id);
-		} else {
+		if (holidayRequest != null) {
+			Long requesterId = holidayRequest.getRequester().getId();
+			HrUser authenticatedUser = (HrUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			if (requesterId != authenticatedUser.getEmployee().getId())
+				throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+			
+			if (holidayRequest.getStatus() == HolidayRequestStatus.NEW) {
+				holidayRequest.getRequester().getHolidayRequests().remove(holidayRequest);
+				holidayRequestRepository.deleteById(id);
+			} else 
+				throw new ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED);
+		} else 
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-		}
 			
 	}
 	

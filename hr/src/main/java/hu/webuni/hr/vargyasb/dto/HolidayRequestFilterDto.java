@@ -74,6 +74,5 @@ public class HolidayRequestFilterDto {
 	public void setEndDate(LocalDate endDate) {
 		this.endDate = endDate;
 	}
-
 	
 }
