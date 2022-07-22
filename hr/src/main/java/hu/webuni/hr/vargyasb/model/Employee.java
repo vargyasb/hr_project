@@ -2,6 +2,7 @@ package hu.webuni.hr.vargyasb.model;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -37,6 +38,9 @@ public class Employee{
 	
 	@OneToOne
 	private Employee manager;
+	
+	@OneToMany(mappedBy = "manager")
+	private Collection<Employee> managedEmployees;
 	
 	private String username;
 	private String password;
@@ -148,6 +152,14 @@ public class Employee{
 
 	public void setRoles(Set<String> roles) {
 		this.roles = roles;
+	}
+
+	public Collection<Employee> getManagedEmployees() {
+		return managedEmployees;
+	}
+
+	public void setManagedEmployees(Collection<Employee> managedEmployees) {
+		this.managedEmployees = managedEmployees;
 	}
 
 	@Override

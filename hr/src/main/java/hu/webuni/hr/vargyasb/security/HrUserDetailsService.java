@@ -1,5 +1,6 @@
 package hu.webuni.hr.vargyasb.security;
 
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,7 @@ public class HrUserDetailsService implements UserDetailsService{
 				.orElseThrow(() -> new UsernameNotFoundException(username));
 		
 		return new HrUser(username, employee.getPassword(),
-				employee.getRoles().stream().map(SimpleGrantedAuthority::new)
-				.collect(Collectors.toList()), employee);
+				Arrays.asList(new SimpleGrantedAuthority("USER")), employee);
 	}
 
 }
